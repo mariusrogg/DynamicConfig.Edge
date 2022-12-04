@@ -1,0 +1,137 @@
+{
+    "wifi":
+    {
+        "ssid": "<Your SSID here>",
+        "password": "<Your WIFI-Password here>"
+    },
+    "devices":
+    {
+        "Taxi":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Taxi": 4
+            },
+            "defaultMode": "Taxi",
+            "on": "{0;2000;60}",
+            "off": "{60;300;0}",
+            "modes":
+            {
+                "Taxi":
+                {
+                    "on": true,
+                    "off": true,
+                    "mode": "{60}"
+                }
+            }
+        },
+        "Takeoff":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Takeoff": 5
+            },
+            "defaultMode": "Takeoff",
+            "on": "{0;1000;100}",
+            "off": "{100;300;0}",
+            "modes":
+            {
+                "Takeoff":
+                {
+                    "on": true,
+                    "off": true,
+                    "mode": "{100}"
+                }
+            }
+        },
+        "Wing Position":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Left": 16,
+                "Right": 17
+            },
+            "defaultMode": "Position",
+            "modes":
+            {
+                "Position":
+                {
+                    "mode": "{100}"
+                }
+            }
+        },
+        "Beacon":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Top": 18,
+                "Bottom": 19
+            },
+            "defaultMode": "Beacon",
+            "modes":
+            {
+                "Beacon":
+                {
+                    "sync": 1000,
+                    "mode": "{{0;500}{100;100}{0;400}}"
+                }
+            }
+        },
+        "Wing Strobe":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Left": 21,
+                "Right": 22
+            },
+            "defaultMode": "Strobe",
+            "modes":
+            {
+                "Strobe":
+                {
+                    "sync": 1000,
+                    "mode": "{{100;50}{0;50}{100;50}{0;850}}"
+                }
+            }
+        },
+        "Logo":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Left": 23,
+                "Right": 25
+            },
+            "defaultMode": "Logo",
+            "modes":
+            {
+                "Logo":
+                {
+                    "mode": "{80}"
+                }
+            }
+        },
+        "Tail Strobe":
+        {
+            "type": "pwm",
+            "pins":
+            {
+                "Tail": 26
+            },
+            "defaultMode": "Strobe",
+            "modes":
+            {
+                "Strobe":
+                {
+                    "sync": 1000,
+                    "mode": "{{100;100}{0;900}}"
+                }
+            }
+        }
+    }
+}
