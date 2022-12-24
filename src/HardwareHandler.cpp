@@ -1,5 +1,5 @@
 #include "HardwareHandler.hpp"
-#include <String>
+#include <string>
 #include "WiFiHandler.hpp"
 #include <sstream>
 #include "DevicePWM.hpp"
