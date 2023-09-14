@@ -1,3 +1,12 @@
+//!
+//! @file OnboardPWM.hpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Class for controlling onboard PWM
+//! @version 0.0.0
+//! @date 2023-09-14
+//!
+//! @copyright Copyright (c) 2023
+//!
 #pragma once
 #include "BaseAnalogueOutput.hpp"
 #include <vector>
@@ -5,29 +14,33 @@
 
 namespace ModelController
 {
-    class OnboardPWM : BaseAnalogueOutput
+    class OnboardPWM : public BaseAnalogueOutput
     {
     private:
         //!
         //! @brief PWM-Channels already used by the program
         //!
-        static std::vector<int> usedChannels;
+        static std::vector<uint8_t> usedChannels;
         //!
         //! @brief Amount of channels on the controller
         //!
-        static constexpr int numberChannels = 16;
+        static constexpr uint8_t numberChannels = 16;
         //!
         //! @brief Number of the channel
         //!
-        int channel;
+        uint8_t channel;
         //!
         //! @brief Resolution of the channel
         //!
-        int resolution;
+        uint8_t resolution;
+        //!
+        //! @brief Frequency of the channel
+        //!
+        uint32_t frequency;
         //!
         //! @brief Pins attached to the channel
         //!
-        std::vector<int> pins;
+        std::vector<uint8_t> pins;
         //!
         //! @brief Get the a free channel
         //!
@@ -40,7 +53,7 @@ namespace ModelController
         //! @param frequency   Cycle Frequency of the channel
         //! @param resolution  Resolution of the channel
         //!
-        void SetChannel(int frequency = DefaultFrequency, int resolution = DefaultResolution);
+        void SetChannel(uint32_t frequency = DefaultFrequency, uint8_t resolution = DefaultResolution);
 
     protected:
         //!
@@ -50,7 +63,7 @@ namespace ModelController
         //! @return true Value was successfully set to output
         //! @return false Value could not be set to output
         //!
-        virtual bool SetOutputValue(double value) = 0;
+        virtual bool SetOutputValue(double value);
 
     public:
         //!
@@ -60,28 +73,28 @@ namespace ModelController
         //!
         //! @brief Default cycle frequency of the channel
         //!
-        static const int DefaultFrequency = 5000;
+        static const uint32_t DefaultFrequency = 5000;
         //!
         //! @brief Default resolution of the channel
         //!
-        static const int DefaultResolution = 8;
+        static const uint8_t DefaultResolution = 8;
         //!
         //! @brief Construct a new PWMChannel object
         //!
         //! @param name Name of the device
         //! @param config Config of the device
-        //! @param parent Parent of the HWDevice (normally pass this)
+        //! @param parent Parent of the Device (normally pass this)
         //!
-        OnboardPWM(std::string name, JsonObject config, HWDevice* parent = nullptr);
+        OnboardPWM(std::string name, JsonObject config, Device* parent = nullptr);
         //!
         //! @brief Destroy the PWMChannel object
         //!
-        ~OnboardPWM();
+        virtual ~OnboardPWM();
         //!
-        //! @brief Generate the config of the device
+        //! @brief Get the config of the device
         //!
-        //! @param doc Json document to create Config to
+        //! @return string Config created
         //!
-        virtual string GetConfig(JsonDocument* doc) override;
+        virtual std::string GetConfig() override;
     };
 } // namespace ModelController
