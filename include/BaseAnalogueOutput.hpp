@@ -1,9 +1,18 @@
+//!
+//! @file BaseAnalogueOutput.hpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Base-Class for analogue output values
+//! @version 0.0.0
+//! @date 2023-09-14
+//!
+//! @copyright Copyright (c) 2023
+//!
 #pragma once
-#include "HWDevice.hpp"
+#include "Device.hpp"
 
 namespace ModelController
 {
-    class BaseAnalogueOutput : public HWDevice
+    class BaseAnalogueOutput : public Device
     {
     private:
         //!
@@ -27,13 +36,13 @@ namespace ModelController
         //!
         //! @param name Name of the device
         //! @param config Config of the device
-        //! @param parent Parent of the HWDevice (normally pass this)
+        //! @param parent Parent of the Device (normally pass this)
         //!
-        BaseAnalogueOutput(std::string name, JsonObject config, HWDevice* parent = nullptr);
+        BaseAnalogueOutput(std::string name, JsonObject config, Device* parent = nullptr);
         //!
         //! @brief Destroy the Base Analog Output object
         //!
-        ~BaseAnalogueOutput();
+        virtual ~BaseAnalogueOutput();
         //!
         //! @brief Set the channels duty value
         //!
