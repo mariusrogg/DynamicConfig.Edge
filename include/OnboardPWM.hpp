@@ -8,13 +8,13 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseAnalogueOutput.hpp"
+#include "BaseOutputConnector.hpp"
 #include <vector>
 #include <map>
 
 namespace ModelController
 {
-    class OnboardPWM : public BaseAnalogueOutput
+    class OnboardPWM : public BaseOutputConnector<double>
     {
     private:
         //!
