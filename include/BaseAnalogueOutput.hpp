@@ -9,10 +9,11 @@
 //!
 #pragma once
 #include "Connector.hpp"
+#include "BaseOutputConnector.hpp"
 
 namespace ModelController
 {
-    class BaseAnalogueOutput : public Connector
+    class BaseAnalogueOutput : public BaseOutputConnector<double>
     {
     private:
         //!
@@ -39,21 +40,5 @@ namespace ModelController
         //! @param parent Parent of the Connector (normally pass this)
         //!
         BaseAnalogueOutput(std::string name, JsonObject config, Connector* parent = nullptr);
-        //!
-        //! @brief Destroy the Base Analog Output object
-        //!
-        virtual ~BaseAnalogueOutput();
-        //!
-        //! @brief Set the channels duty value
-        //!
-        //! @param value Duty value
-        //!
-        void SetValue(double value);
-        //!
-        //! @brief Get the actual value set to channel
-        //!
-        //! @return double Actual value set to channel
-        //!
-        double GetValue() const;
     };
 } // namespace ModelController
