@@ -14,8 +14,8 @@ namespace ModelController
     //!
     //! @brief Construct a new Base Analogue Output object
     //!
-    BaseAnalogueOutput::BaseAnalogueOutput(std::string name, JsonObject config, Device* parent)
-        : Device(name, config, parent)
+    BaseAnalogueOutput::BaseAnalogueOutput(std::string name, JsonObject config, Connector* parent)
+        : Connector(name, config, parent)
     {
     }
     //!

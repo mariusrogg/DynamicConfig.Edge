@@ -2,17 +2,17 @@
 //! @file BaseAnalogueOutput.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Base-Class for analogue output values
-//! @version 0.0.0
+//! @version 0.1.0
 //! @date 2023-09-14
 //!
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "Device.hpp"
+#include "Connector.hpp"
 
 namespace ModelController
 {
-    class BaseAnalogueOutput : public Device
+    class BaseAnalogueOutput : public Connector
     {
     private:
         //!
@@ -34,11 +34,11 @@ namespace ModelController
         //!
         //! @brief Construct a new Base Analog Output object
         //!
-        //! @param name Name of the device
-        //! @param config Config of the device
-        //! @param parent Parent of the Device (normally pass this)
+        //! @param name Name of the analogue output
+        //! @param config Config of the analogue output
+        //! @param parent Parent of the Connector (normally pass this)
         //!
-        BaseAnalogueOutput(std::string name, JsonObject config, Device* parent = nullptr);
+        BaseAnalogueOutput(std::string name, JsonObject config, Connector* parent = nullptr);
         //!
         //! @brief Destroy the Base Analog Output object
         //!

@@ -1,13 +1,13 @@
 //!
-//! @file Device.cpp
+//! @file Connector.cpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
-//! @brief Implementation of the device
+//! @brief Implementation of the connector
 //! @version 0.0.0
 //! @date 2023-09-14
 //!
 //! @copyright Copyright (c) 2023
 //!
-#include "Device.hpp"
+#include "Connector.hpp"
 #include <sstream>
 #include "LittleFS.h"
 #include "OnboardPWM.hpp"
@@ -18,27 +18,27 @@ using namespace std;
 namespace ModelController
 {
     //!
-    //! @brief List with all devices of the controller
+    //! @brief List with all connectors of the controller
     //!
-    std::map<string, Device*> Device::devices;
+    std::map<string, Connector*> Connector::connectors;
     //!
     //! @brief Path to the configuration path
     //!
-    std::string Device::configFilePath = Device::defaultConfigFile;
+    std::string Connector::configFilePath = Connector::defaultConfigFile;
     //!
-    //! @brief Root device
+    //! @brief Root connector
     //!
-    Device* Device::rootDevice = nullptr;
+    Connector* Connector::rootConnector = nullptr;
     //!
-    //! @brief Construct a new Device object
+    //! @brief Construct a new Connector object
     //!
-    Device::Device(string name, JsonObject config, Device* parent)
+    Connector::Connector(string name, JsonObject config, Connector* parent)
         : parent(parent),
         name(name),
         path((GetParent() != nullptr ? GetParent()->GetPath() : "") + "/" + name)
     {
         Serial.println(GetPath().c_str());
-        devices[GetPath()] = this;
+        connectors[GetPath()] = this;
         if (parent)
         {
             parent->children.push_back(this);
@@ -48,13 +48,13 @@ namespace ModelController
         {
             // ToDo: Only dive in GenerateDevie if child.value() is object
             Serial.println(child.key().c_str());
-            GenerateDevice(child.key().c_str(), child.value(), this);
+            GenerateConnector(child.key().c_str(), child.value(), this);
         }
     }
     //!
-    //! @brief Destruction the Device object
+    //! @brief Destruction the Connector object
     //!
-    Device::~Device()
+    Connector::~Connector()
     {
         if (parent)
         {
@@ -64,47 +64,47 @@ namespace ModelController
     //!
     //! @brief Returns parent of the actual object
     //!
-    Device* Device::GetParent() const
+    Connector* Connector::GetParent() const
     {
         return parent;
     }
     //!
     //! @brief Returns path of the actual object
     //!
-    string Device::GetPath() const
+    string Connector::GetPath() const
     {
         return path;
     }
     //!
     //! @brief Returns name of the actual object
     //!
-    string Device::GetName() const
+    string Connector::GetName() const
     {
         return name;
     }
     //!
-    //! @brief Generates device from json
+    //! @brief Generates connector from json
     //!
-    Device* Device::GenerateDevice(string name, JsonObject deviceConfig, Device* parent)
+    Connector* Connector::GenerateConnector(string name, JsonObject connectorConfig, Connector* parent)
     {
-        Device* device = nullptr;
-        if (deviceConfig["type"].is<string>())
+        Connector* connector = nullptr;
+        if (connectorConfig["type"].is<string>())
         {
-            string type = deviceConfig["type"].as<string>();
+            string type = connectorConfig["type"].as<string>();
             if (type == OnboardPWM::type)
             {
-                device = new OnboardPWM(name, deviceConfig, parent);
+                connector = new OnboardPWM(name, connectorConfig, parent);
             }
         }
-        return device;
+        return connector;
     }
     //!
-    //! @brief Get config of the device and it's children
+    //! @brief Get config of the connector and it's children
     //!
-    string Device::GetConfig()
+    string Connector::GetConfig()
     {
         stringstream config;
-        for (std::vector<Device*>::iterator it = children.begin(); it != children.end(); it++)
+        for (std::vector<Connector*>::iterator it = children.begin(); it != children.end(); it++)
         {
             if (it != children.begin())
             {
@@ -117,12 +117,12 @@ namespace ModelController
     //!
     //! @brief Update config of the controller
     //!
-    void Device::UpdateConfig(JsonObject config)
+    void Connector::UpdateConfig(JsonObject config)
     {
-        if (rootDevice != nullptr)
+        if (rootConnector != nullptr)
         {
-            delete rootDevice;
-            rootDevice = nullptr;
+            delete rootConnector;
+            rootConnector = nullptr;
         }
 
         string hwName = "HW";
@@ -140,26 +140,26 @@ namespace ModelController
 
         WiFiHandler::SetSSIDPassword(cnf["wifi"]["ssid"], cnf["wifi"]["password"]);
 
-        rootDevice = new Device(hwName, cnf);
+        rootConnector = new Connector(hwName, cnf);
 
-        std::string hwConfig = "{ \"" + rootDevice->GetName() + "\": {" + rootDevice->GetConfig() + "}}";
+        std::string connectors = "{ \"" + rootConnector->GetName() + "\": {" + rootConnector->GetConfig() + "}}";
 
         // ToDo: Override file on change
-        // File file = LittleFS.open(Device::configFilePath.c_str(), FILE_WRITE);
+        // File file = LittleFS.open(Connector::configFilePath.c_str(), FILE_WRITE);
         // if (!file)
         // {
         //     return;
         // }
-        // file.print(hwConfig.c_str());
+        // file.print(connectors.c_str());
         // file.close();
     }
     //!
     //! @brief Initially build config
     //!
-    void Device::InitConfig(std::string configFilePath)
+    void Connector::InitConfig(std::string configFilePath)
     {
-        Device::configFilePath = configFilePath;
-        File file = LittleFS.open(Device::configFilePath.c_str(), FILE_READ);
+        Connector::configFilePath = configFilePath;
+        File file = LittleFS.open(Connector::configFilePath.c_str(), FILE_READ);
         DynamicJsonDocument jsonDoc(32768);
 
         deserializeJson(jsonDoc, file);

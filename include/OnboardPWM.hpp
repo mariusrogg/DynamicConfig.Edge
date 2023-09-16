@@ -81,17 +81,17 @@ namespace ModelController
         //!
         //! @brief Construct a new PWMChannel object
         //!
-        //! @param name Name of the device
-        //! @param config Config of the device
-        //! @param parent Parent of the Device (normally pass this)
+        //! @param name Name of the connector
+        //! @param config Config of the connector
+        //! @param parent Parent of the Connector (normally pass this)
         //!
-        OnboardPWM(std::string name, JsonObject config, Device* parent = nullptr);
+        OnboardPWM(std::string name, JsonObject config, Connector* parent = nullptr);
         //!
         //! @brief Destroy the PWMChannel object
         //!
         virtual ~OnboardPWM();
         //!
-        //! @brief Get the config of the device
+        //! @brief Get the config of the connector
         //!
         //! @return string Config created
         //!
