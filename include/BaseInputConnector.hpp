@@ -2,8 +2,6 @@
 //! @file BaseInputConnector.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Base class for input variables
-//! @version 0.0.0
-//! @date 2023-09-14
 //!
 //! @copyright Copyright (c) 2023
 //!

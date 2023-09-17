@@ -2,8 +2,6 @@
 //! @file Connector.cpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Implementation of the connector
-//! @version 0.0.0
-//! @date 2023-09-14
 //!
 //! @copyright Copyright (c) 2023
 //!

@@ -1,3 +1,10 @@
+//!
+//! @file WiFiHandler.cpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Implementation of the WiFi-Handler
+//!
+//! @copyright Copyright (c) 2023
+//!
 #include "WiFiHandler.hpp"
 
 unsigned long WiFiHandler::timeout = 5000;

@@ -2,8 +2,6 @@
 //! @file Connector.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Base class of Hardware connectors
-//! @version 0.0.0
-//! @date 2022-12-10
 //!
 //! @copyright Copyright (c) 2022
 //!

@@ -1,9 +1,14 @@
+//!
+//! @file WiFiHandler.hpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Class for connecting to WiFi
+//!
+//! @copyright Copyright (c) 2023
+//!
 #pragma once
 #include "WiFi.h"
 #include "ArduinoJson.h"
-//!
-//! @brief Class for connecting to WiFi
-//!
+
 class WiFiHandler
 {
 private:

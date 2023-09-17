@@ -2,8 +2,6 @@
 //! @file EventHandling.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Event and listener for event driven programming
-//! @version 0.0.0
-//! @date 2023-09-16
 //!
 //! @copyright Copyright (c) 2023
 //!

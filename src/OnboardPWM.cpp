@@ -2,8 +2,6 @@
 //! @file OnboardPWM.cpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Implemantation of the Onboard PWM
-//! @version 0.0.0
-//! @date 2023-09-14
 //!
 //! @copyright Copyright (c) 2023
 //!
