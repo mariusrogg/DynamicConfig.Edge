@@ -36,6 +36,15 @@ namespace ModelController
                     ValueChangedEvent(GetValue());
                 }
             }
+            //!
+            //! @brief Get the Type of the connector
+            //!
+            //! @return ConnectorType::input
+            //!
+            ConnectorType GetType() const
+            {
+                return ConnectorType::input;
+            }
 
         public:
             //!

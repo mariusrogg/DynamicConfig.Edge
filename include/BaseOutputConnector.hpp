@@ -31,6 +31,15 @@ namespace ModelController
             //! @return false Value could not be set to output
             //!
             virtual bool SetOutputValue(T value) = 0;
+            //!
+            //! @brief Get the Type of the connector
+            //!
+            //! @return ConnectorType::output
+            //!
+            ConnectorType GetType() const
+            {
+                return ConnectorType::output;
+            }
 
         public:
             //!
