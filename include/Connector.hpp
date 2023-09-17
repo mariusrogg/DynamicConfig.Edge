@@ -19,11 +19,18 @@ namespace ModelController
 {
     class Connector
     {
+    public:
+        //!
+        //! @brief Type of the connector
+        //!
+        enum class ConnectorType
+        {
+            input,          //!< Type is input
+            output,         //!< Type is output
+            none,           //!< Type is neither input nor output
+            undefined,      //!< Type is not defined
+        };
     private:
-        //!
-        //! @brief List with all connectors in programm and their paths
-        //!
-        static std::map<std::string, Connector*> connectors;
         //!
         //! @brief Root connector of the hardware configuration
         //!
@@ -48,6 +55,17 @@ namespace ModelController
         //! @brief Default config file path
         //!
         static std::string configFilePath;
+
+    protected:
+        //!
+        //! @brief Get the Type of the connector
+        //!
+        //! @return undefined if not overridden by derived class
+        //!
+        virtual ConnectorType GetType() const
+        {
+            return ConnectorType::undefined;
+        }
 
     public:
         //!
@@ -104,14 +122,49 @@ namespace ModelController
         //! @return T* Connector with path
         //!
         template<class T>
-        static T* GetConnector(std::string connectorPath)
+        T* GetChildConnector(std::string connectorPath, ConnectorType type = ConnectorType::undefined)
         {
+            // Trim '/' at start of path
+            connectorPath = connectorPath.substr(connectorPath.find_first_not_of('/'));
             Connector* connector = nullptr;
-            if (connectors.find(connectorPath) != connectors.end())
+            std::string name = connectorPath;
+            std::string subPath = "";
+            // Split path into name and further path
+            if (connectorPath.find('/') != std::string::npos)
             {
-                connector = connectors[connectorPath];
+                name = connectorPath.substr(0, connectorPath.find('/'));
+                subPath = connectorPath.substr(connectorPath.find('/') + 1);
+            }
+            for (Connector* child : children)
+            {
+                if (child->GetName() == name)
+                {
+                    if (subPath.size() == 0)
+                    {
+                        if (type == ConnectorType::undefined || connector->GetType() == type)
+                        {
+                            connector = child;
+                        }
+                    }
+                    else
+                    {
+                        connector = child->GetChildConnector<T>(subPath, type);
+                    }
+                    break;
+                }
             }
             return dynamic_cast<T*>(connector);
+        }
+        //!
+        //! @brief Get a connector by path
+        //!
+        //! @param connectorPath Path of the connector
+        //! @return T* Connector with path
+        //!
+        template<class T>
+        static T* GetConnector(std::string connectorPath, ConnectorType type = ConnectorType::undefined)
+        {
+            return rootConnector == nullptr ? nullptr : rootConnector->GetChildConnector<T>(connectorPath, type);
         }
         //!
         //! @brief Update hardware configuration
