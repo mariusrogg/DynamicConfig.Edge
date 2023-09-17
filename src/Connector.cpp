@@ -18,10 +18,6 @@ using namespace std;
 namespace ModelController
 {
     //!
-    //! @brief List with all connectors of the controller
-    //!
-    std::map<string, Connector*> Connector::connectors;
-    //!
     //! @brief Path to the configuration path
     //!
     std::string Connector::configFilePath = Connector::defaultConfigFile;
@@ -38,17 +34,17 @@ namespace ModelController
         path((GetParent() != nullptr ? GetParent()->GetPath() : "") + "/" + name)
     {
         Serial.println(GetPath().c_str());
-        connectors[GetPath()] = this;
         if (parent)
         {
             parent->children.push_back(this);
         }
-
         for (JsonPair child : config)
         {
-            // ToDo: Only dive in GenerateDevie if child.value() is object
-            Serial.println(child.key().c_str());
-            GenerateConnector(child.key().c_str(), child.value(), this);
+            if (child.value().is<JsonObject>())
+            {
+                Serial.println(child.key().c_str());
+                GenerateConnector(child.key().c_str(), child.value(), this);
+            }
         }
     }
     //!
