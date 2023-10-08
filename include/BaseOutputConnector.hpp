@@ -29,15 +29,6 @@ namespace ModelController
             //! @return false Value could not be set to output
             //!
             virtual bool SetOutputValue(T value) = 0;
-            //!
-            //! @brief Get the Type of the connector
-            //!
-            //! @return ConnectorType::output
-            //!
-            ConnectorType GetType() const
-            {
-                return ConnectorType::output;
-            }
 
         public:
             //!
@@ -52,7 +43,16 @@ namespace ModelController
             //! @param parent Parent of the Connector (normally pass this)
             //!
             BaseOutputConnector(std::string name, JsonObject config, Connector* parent = nullptr)
-                : Connector(name, config, parent)
+                : Connector(name, config, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
+            { }
+            //!
+            //! @brief Construct a new Base Output object
+            //!
+            //! @param name Name of the connector
+            //! @param parent Parent of the Connector (normally pass this)
+            //!
+            BaseOutputConnector(std::string name, Connector* parent = nullptr)
+                : Connector(name, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Set the target value for the output
@@ -78,6 +78,18 @@ namespace ModelController
             T GetValue() const
             {
                 return actualValue;
+            }
+            //!
+            //! @brief Get the output connector by path
+            //!
+            //! @tparam T Underlying (primitive) type of the output connector
+            //! @param connectorPath Path of the output connector
+            //! @return BaseOutputConnector<T> OutputConnector with path
+            //!
+            template<class DT>
+            static BaseOutputConnector<DT> GetOutputConnector(std::string connectorPath)
+            {
+                return GetConnector<BaseOutputConnector<DT>>(connectorPath, ConnectorType::eOutput, GetDataTypeById(typeid(T)));
             }
     };
 } // namespace ModelController

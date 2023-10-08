@@ -34,15 +34,6 @@ namespace ModelController
                     ValueChangedEvent(GetValue());
                 }
             }
-            //!
-            //! @brief Get the Type of the connector
-            //!
-            //! @return ConnectorType::input
-            //!
-            ConnectorType GetType() const
-            {
-                return ConnectorType::input;
-            }
 
         public:
             //!
@@ -57,7 +48,16 @@ namespace ModelController
             //! @param parent Parent of the Connector (normally pass this)
             //!
             BaseInputConnector(std::string name, JsonObject config, Connector* parent = nullptr)
-                : Connector(name, config, parent)
+                : Connector(name, config, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
+            { }
+            //!
+            //! @brief Construct a new Base Input Connector object
+            //!
+            //! @param name Name of the connector
+            //! @param parent Parent of the Connector (normally pass this)
+            //!
+            BaseInputConnector(std::string name, Connector* parent = nullptr)
+                : Connector(name, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Get the actual value set to input
@@ -67,6 +67,18 @@ namespace ModelController
             T GetValue() const
             {
                 return actualValue;
+            }
+            //!
+            //! @brief Get the input connector by path
+            //!
+            //! @tparam T Underlying (primitive) type of the input connector
+            //! @param connectorPath Path of the input connector
+            //! @return BaseInputConnector<T> InputConnector with path
+            //!
+            template<class DT>
+            static BaseInputConnector<DT> GetInputConnector(std::string connectorPath)
+            {
+                return GetConnector<BaseInputConnector<DT>>(connectorPath, ConnectorType::eInput, GetDataTypeById(typeid(T)));
             }
     };
 } // namespace ModelController
