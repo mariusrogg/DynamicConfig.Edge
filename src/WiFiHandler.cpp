@@ -14,6 +14,9 @@ int WiFiHandler::reconnectsBeforeFail = 5;
 bool WiFiHandler::activeAP = false;
 std::string WiFiHandler::ssid = "Controller";
 std::string WiFiHandler::password = "Controller";
+bool WiFiHandler::staConnected = false;
+ModelController::Event<> WiFiHandler::STAConnected;
+ModelController::Event<> WiFiHandler::APInitialized;
 
 //!
 //! @brief Disconnect from WiFi and restart with new settings
@@ -21,6 +24,7 @@ std::string WiFiHandler::password = "Controller";
 void WiFiHandler::BeginSTA(const char* ssid, const char* password)
 {
     reconnects = 0;
+    staConnected = false;
     WiFi.disconnect();
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
@@ -39,6 +43,8 @@ bool WiFiHandler::BeginAP()
 //!
 bool WiFiHandler::BeginAP(const char* ssid, const char* password)
 {
+    staConnected = false;
+    bool success = false;
     reconnects = 0;
     WiFi.disconnect();
     WiFi.mode(WIFI_AP);
@@ -50,7 +56,12 @@ bool WiFiHandler::BeginAP(const char* ssid, const char* password)
         Serial.println("STA Failed to configure");
     }
     Serial.println("Starting AP ..");
-    return WiFi.softAP(ssid, password);
+    if (WiFi.softAP(ssid, password))
+    {
+        APInitialized.Raise();
+        success = true;
+    }
+    return success;
 }
 //!
 //! @brief Check if WiFi is connected
@@ -71,9 +82,16 @@ bool WiFiHandler::Check()
             timeStarted = millis();
             retVal = true;
             reconnects = 0;
+            if (!staConnected)
+            {
+                Serial.println("STA Connected");
+                STAConnected.Raise();
+                staConnected = true;
+            }
         }
         else if (millis() > timeStarted + timeout)
         {
+            staConnected = false;
             //!
             //! @brief Reconnect if WiFi-Station is not connected
             //!
@@ -94,11 +112,13 @@ bool WiFiHandler::Check()
         }
         else
         {
+            staConnected = false;
             retVal = false;
         }
     }
     else
     {
+        staConnected = false;
         //!
         //! @brief Return true if AP is active/started successfully
         //!

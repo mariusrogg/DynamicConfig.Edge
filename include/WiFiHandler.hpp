@@ -8,6 +8,7 @@
 #pragma once
 #include "WiFi.h"
 #include "ArduinoJson.h"
+#include "EventHandling.hpp"
 
 class WiFiHandler
 {
@@ -49,6 +50,10 @@ private:
     //!
     static std::string password;
     //!
+    //! @brief True if WiFi-Station is connected
+    //!
+    static bool staConnected;
+    //!
     //! @brief Connect to STA
     //!
     //! @param ssid SSID of the WiFi-Station
@@ -74,6 +79,14 @@ private:
     static bool BeginAP(const char* ssid, const char* password);
 
 public:
+    //!
+    //! @brief Event raised, if AP is initialized
+    //!
+    static ModelController::Event<> APInitialized;
+    //!
+    //! @brief Event raised if STA is connected
+    //!
+    static ModelController::Event<> STAConnected;
     //!
     //! @brief Check if WiFi is connected
     //!
