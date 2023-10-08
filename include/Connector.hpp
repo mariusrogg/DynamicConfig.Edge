@@ -23,11 +23,58 @@ namespace ModelController
         //!
         enum class ConnectorType
         {
-            input,          //!< Type is input
-            output,         //!< Type is output
-            none,           //!< Type is neither input nor output
-            undefined,      //!< Type is not defined
+            eUndefined,      //!< Type is not defined
+            eInput,          //!< Type is input
+            eOutput,         //!< Type is output
+            eNone,           //!< Type is neither input nor output
         };
+        //!
+        //! @brief Get ConnectorType as string
+        //!
+        //! @param type ConnectorType to get
+        //! @return std::string Name of the type
+        //!
+        static std::string TypeToString(ConnectorType type);
+        //!
+        //! @brief Data type of the connected variable
+        //!
+        enum class ConnectorDataType
+        {
+            eUndefined, //!< Type is not defined
+            eNone,      //!< Connector has no type
+            eDouble,    //!< Connected data type is double
+            eFloat,     //!< Connected data type is float
+            eString,    //!< Connected data type is std::string
+            eInt8,      //!< Connected data type is signed 8 bit integer
+            eInt16,     //!< Connected data type is signed 16 bit integer
+            eInt32,     //!< Connected data type is signed 32 bit integer
+            eInt64,     //!< Connected data type is signed 64 bit integer
+            eUInt8,     //!< Connected data type is unsigned 8 bit integer
+            eUInt16,    //!< Connected data type is unsigned 16 bit integer
+            eUInt32,    //!< Connected data type is unsigned 32 bit integer
+            eUInt64,    //!< Connected data type is unsigned 64 bit integer
+            eBool,      //!< Connected data type is boolean
+        };
+        //!
+        //! @brief Get ConnectorDataType as string
+        //!
+        //! @param dataType ConnectorDataType to get
+        //! @return std::string Name of the dataType
+        //!
+        static std::string DataTypeToString(ConnectorDataType dataType);
+        //!
+        //! @brief Get the Type of the connector
+        //!
+        //! @return ConnectorType Type of the object
+        //!
+        ConnectorType GetType() const;
+        //!
+        //! @brief Get the DataType of the connector
+        //!
+        //! @return ConnectorDataType DataType of the object
+        //!
+        ConnectorDataType GetDataType() const;
+
     private:
         //!
         //! @brief Root connector of the hardware configuration
@@ -56,16 +103,31 @@ namespace ModelController
 
     protected:
         //!
-        //! @brief Get the Type of the connector
+        //! @brief Type of the connector
         //!
-        //! @return undefined if not overridden by derived class
+        ConnectorType connectorType = ConnectorType::eUndefined;
         //!
-        virtual ConnectorType GetType() const
-        {
-            return ConnectorType::undefined;
-        }
+        //! @brief Data-Type of the connector
+        //!
+        ConnectorDataType connectorDataType = ConnectorDataType::eUndefined;
+        //!
+        //! @brief Get child of the object
+        //!
+        //! @param connectorPath Path of the child
+        //! @param type ConnectorType of the child
+        //! @param dataType ConnectorDataType of the child
+        //! @return Connector* Child, nullptr if not found
+        //!
+        virtual Connector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined);
 
     public:
+        //!
+        //! @brief Get the data type by typeid
+        //!
+        //! @param typeInfo Usually pass typeid(object) or typeid(Type)
+        //! @return ConnectorDataType Matching data type
+        //!
+        static ConnectorDataType GetDataTypeById(const std::type_info& typeInfo);
         //!
         //! @brief Default config file path
         //!
@@ -76,8 +138,19 @@ namespace ModelController
         //! @param name Name of the connector
         //! @param config Config of the connector
         //! @param parent Parent of the Connector (normally pass this)
+        //! @param ConnectorType Type of the connector
+        //! @param connectorDataType DataType of the connector
         //!
-        Connector(std::string name, JsonObject config, Connector* parent = nullptr);
+        Connector(std::string name, JsonObject config, Connector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
+        //!
+        //! @brief Construct a new Connector object
+        //!
+        //! @param name Name of the connector
+        //! @param parent Parent of the Connector (normally pass this)
+        //! @param ConnectorType Type of the connector
+        //! @param connectorDataType DataType of the connector
+        //!
+        Connector(std::string name, Connector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
         //!
         //! @brief Destroy the Connector object
         //!
@@ -120,38 +193,9 @@ namespace ModelController
         //! @return T* Connector with path
         //!
         template<class T>
-        T* GetChildConnector(std::string connectorPath, ConnectorType type = ConnectorType::undefined)
+        T* GetChildConnector(std::string connectorPath, ConnectorType connectorType = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined)
         {
-            // Trim '/' at start of path
-            connectorPath = connectorPath.substr(connectorPath.find_first_not_of('/'));
-            Connector* connector = nullptr;
-            std::string name = connectorPath;
-            std::string subPath = "";
-            // Split path into name and further path
-            if (connectorPath.find('/') != std::string::npos)
-            {
-                name = connectorPath.substr(0, connectorPath.find('/'));
-                subPath = connectorPath.substr(connectorPath.find('/') + 1);
-            }
-            for (Connector* child : children)
-            {
-                if (child->GetName() == name)
-                {
-                    if (subPath.size() == 0)
-                    {
-                        if (type == ConnectorType::undefined || connector->GetType() == type)
-                        {
-                            connector = child;
-                        }
-                    }
-                    else
-                    {
-                        connector = child->GetChildConnector<T>(subPath, type);
-                    }
-                    break;
-                }
-            }
-            return dynamic_cast<T*>(connector);
+            return dynamic_cast<T*>(GetChild(connectorPath, connectorType, dataType));
         }
         //!
         //! @brief Get a connector by path
@@ -160,9 +204,9 @@ namespace ModelController
         //! @return T* Connector with path
         //!
         template<class T>
-        static T* GetConnector(std::string connectorPath, ConnectorType type = ConnectorType::undefined)
+        static T* GetConnector(std::string connectorPath, ConnectorType connectorType = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined)
         {
-            return rootConnector == nullptr ? nullptr : rootConnector->GetChildConnector<T>(connectorPath, type);
+            return rootConnector == nullptr ? nullptr : rootConnector->GetChildConnector<T>(connectorPath, connectorType, dataType);
         }
         //!
         //! @brief Update hardware configuration
