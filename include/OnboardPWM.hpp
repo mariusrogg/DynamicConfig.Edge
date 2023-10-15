@@ -83,7 +83,7 @@ namespace ModelController
         //! @param config Config of the connector
         //! @param parent Parent of the Connector (normally pass this)
         //!
-        OnboardPWM(std::string name, JsonObject config, Connector* parent = nullptr);
+        OnboardPWM(std::string name, JsonObject config, BaseConnector* parent = nullptr);
         //!
         //! @brief Destroy the PWMChannel object
         //!

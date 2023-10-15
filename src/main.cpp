@@ -1,6 +1,6 @@
 #include "LittleFS.h"
 #include "OnboardPWM.hpp"
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 #include "WiFiHandler.hpp"
 #include "EventHandling.hpp"
 #include "MQTTOutput.hpp"
@@ -46,26 +46,26 @@ void setup()
         Serial.println("LittleFS Mount Failed");
         return;
     }
-    File connectors = LittleFS.open(ModelController::Connector::defaultConfigFile);
+    File connectors = LittleFS.open(ModelController::BaseConnector::defaultConfigFile);
     Serial.println(connectors.readString().c_str());
     connectors.close();
 
-    ModelController::Connector::InitConfig();
+    ModelController::BaseConnector::InitConfig();
 
     event += callback1;
     event += callback2;
 
     Serial.print("Double: ");
-    Serial.println(ModelController::Connector::DataTypeToString(ModelController::Connector::GetDataTypeById(typeid(double))).c_str());
+    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(double))).c_str());
     Serial.print("String: ");
-    Serial.println(ModelController::Connector::DataTypeToString(ModelController::Connector::GetDataTypeById(typeid(std::string))).c_str());
+    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(std::string))).c_str());
     Serial.print("Bool: ");
-    Serial.println(ModelController::Connector::DataTypeToString(ModelController::Connector::GetDataTypeById(typeid(bool))).c_str());
+    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(bool))).c_str());
 
     // loopListener = new ModelController::LoopEvent::LoopListener(loopCallback, 2);
-    ModelController::MQTTInput<double>* mqttDbl = ModelController::Connector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::Connector::ConnectorType::eInput, ModelController::Connector::ConnectorDataType::eDouble);
-    Serial.println(ModelController::Connector::DataTypeToString(mqttDbl->GetDataType()).c_str());
-    ModelController::MQTTInput<double>* mqttDblCpy = ModelController::Connector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::Connector::ConnectorType::eInput, ModelController::Connector::ConnectorDataType::eDouble);
+    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
+    Serial.println(ModelController::BaseConnector::DataTypeToString(mqttDbl->GetDataType()).c_str());
+    ModelController::MQTTInput<double>* mqttDblCpy = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
 }
 
 int i = 0;
@@ -86,16 +86,16 @@ void loop()
         listener3 = nullptr;
         i = 0;
     }
-    ModelController::MQTTInput<double>* mqttDbl = ModelController::Connector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::Connector::ConnectorType::eInput, ModelController::Connector::ConnectorDataType::eDouble);
+    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
     double value = mqttDbl->GetValue();
     Serial.print("MQTT in: ");
     Serial.println(value);
-    ModelController::Connector::GetConnector<ModelController::OnboardPWM>("/PWM_0")->SetValue(100.0);
-    ModelController::Connector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(100.0);
-    ModelController::MQTTOutput<int32_t>* mqttInt = ModelController::Connector::GetConnector<ModelController::MQTTOutput<int32_t>>("/mqtt/test/value", ModelController::Connector::ConnectorType::eOutput, ModelController::Connector::ConnectorDataType::eInt32);
+    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_0")->SetValue(100.0);
+    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(100.0);
+    ModelController::MQTTOutput<int32_t>* mqttInt = ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<int32_t>>("/mqtt/test/value", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eInt32);
     mqttInt->SetValue(i);
-    ModelController::Connector::GetConnector<ModelController::MQTTOutput<double>>("/mqtt/const/twenty", ModelController::Connector::ConnectorType::eOutput, ModelController::Connector::ConnectorDataType::eDouble)->SetValue(20);
-    // ModelController::Connector::GetConnector<ModelController::MQTTOutput<std::string>>("/mqtt/const/string", ModelController::Connector::ConnectorType::eOutput, ModelController::Connector::ConnectorDataType::eString)->SetValue("string");
+    ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<double>>("/mqtt/const/twenty", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eDouble)->SetValue(20);
+    // ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<std::string>>("/mqtt/const/string", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eString)->SetValue("string");
 
     sleep(1);
 }

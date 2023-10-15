@@ -23,7 +23,7 @@ namespace ModelController
         //! @param name Name of the variable (topic without slash at beginning)
         //! @param parent Parent of the MQTTInput (MQTTClient)
         //!
-        MQTTInput(std::string name, Connector* parent = nullptr)
+        MQTTInput(std::string name, BaseConnector* parent = nullptr)
             : BaseInputConnector<T>(name, parent)
         {
         }

@@ -6,13 +6,13 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 #include "EventHandling.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseOutputConnector : public Connector
+    class BaseOutputConnector : public BaseConnector
     {
         private:
             //!
@@ -42,8 +42,8 @@ namespace ModelController
             //! @param config Config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseOutputConnector(std::string name, JsonObject config, Connector* parent = nullptr)
-                : Connector(name, config, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
+            BaseOutputConnector(std::string name, JsonObject config, BaseConnector* parent = nullptr)
+                : BaseConnector(name, config, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Construct a new Base Output object
@@ -51,8 +51,8 @@ namespace ModelController
             //! @param name Name of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseOutputConnector(std::string name, Connector* parent = nullptr)
-                : Connector(name, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
+            BaseOutputConnector(std::string name, BaseConnector* parent = nullptr)
+                : BaseConnector(name, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Set the target value for the output

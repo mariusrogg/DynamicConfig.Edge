@@ -1,5 +1,5 @@
 //!
-//! @file Connector.hpp
+//! @file BaseConnector.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Base class of Hardware connectors
 //!
@@ -15,7 +15,7 @@
 
 namespace ModelController
 {
-    class Connector
+    class BaseConnector
     {
     public:
         //!
@@ -79,15 +79,15 @@ namespace ModelController
         //!
         //! @brief Root connector of the hardware configuration
         //!
-        static Connector* rootConnector;
+        static BaseConnector* rootConnector;
         //!
         //! @brief Parent of the connector object
         //!
-        Connector* parent;
+        BaseConnector* parent;
         //!
         //! @brief Children of the connector object
         //!
-        std::vector<Connector*> children;
+        std::vector<BaseConnector*> children;
         //!
         //! @brief Path of the connector object
         //!
@@ -116,9 +116,9 @@ namespace ModelController
         //! @param connectorPath Path of the child
         //! @param type ConnectorType of the child
         //! @param dataType ConnectorDataType of the child
-        //! @return Connector* Child, nullptr if not found
+        //! @return BaseConnector* Child, nullptr if not found
         //!
-        virtual Connector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined);
+        virtual BaseConnector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined);
 
     public:
         //!
@@ -141,7 +141,7 @@ namespace ModelController
         //! @param ConnectorType Type of the connector
         //! @param connectorDataType DataType of the connector
         //!
-        Connector(std::string name, JsonObject config, Connector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
+        BaseConnector(std::string name, JsonObject config, BaseConnector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
         //!
         //! @brief Construct a new Connector object
         //!
@@ -150,17 +150,17 @@ namespace ModelController
         //! @param ConnectorType Type of the connector
         //! @param connectorDataType DataType of the connector
         //!
-        Connector(std::string name, Connector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
+        BaseConnector(std::string name, BaseConnector* parent = nullptr, ConnectorType ConnectorType = ConnectorType::eUndefined, ConnectorDataType connectorDataType = ConnectorDataType::eUndefined);
         //!
         //! @brief Destroy the Connector object
         //!
-        virtual ~Connector();
+        virtual ~BaseConnector();
         //!
         //! @brief Get the Parent of the object
         //!
-        //! @return Connector* Parent of the object
+        //! @return BaseConnector* Parent of the object
         //!
-        Connector* GetParent() const;
+        BaseConnector* GetParent() const;
         //!
         //! @brief Get the path of the object
         //!
@@ -177,9 +177,9 @@ namespace ModelController
         //! @brief Generate connector from json
         //!
         //! @param connectorConfig Config of the connector
-        //! @return Connector* Created connector
+        //! @return BaseConnector* Created connector
         //!
-        static Connector* GenerateConnector(std::string name, JsonObject connectorConfig, Connector* parent = nullptr);
+        static BaseConnector* GenerateConnector(std::string name, JsonObject connectorConfig, BaseConnector* parent = nullptr);
         //!
         //! @brief Get the config of the connector
         //!
@@ -190,7 +190,7 @@ namespace ModelController
         //! @brief Get a connector by path
         //!
         //! @param connectorPath Path of the connector
-        //! @return T* Connector with path
+        //! @return T* BaseConnector with path
         //!
         template<class T>
         T* GetChildConnector(std::string connectorPath, ConnectorType connectorType = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined)
@@ -201,7 +201,7 @@ namespace ModelController
         //! @brief Get a connector by path
         //!
         //! @param connectorPath Path of the connector
-        //! @return T* Connector with path
+        //! @return T* BaseConnector with path
         //!
         template<class T>
         static T* GetConnector(std::string connectorPath, ConnectorType connectorType = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined)

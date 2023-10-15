@@ -7,7 +7,7 @@
 //!
 #pragma once
 #include <string>
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 
 namespace ModelController
 {

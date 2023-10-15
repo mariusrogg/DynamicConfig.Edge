@@ -63,10 +63,10 @@ namespace ModelController
     //!
     //! @brief Get input/ouput mqtt variable, generate new if none found with given properties
     //!
-    Connector* MQTTClient::GetChild(std::string connectorPath, ConnectorType type, ConnectorDataType dataType)
+    BaseConnector* MQTTClient::GetChild(std::string connectorPath, ConnectorType type, ConnectorDataType dataType)
     {
-        Connector* child = nullptr;
-        child = Connector::GetChild(connectorPath, type, dataType);
+        BaseConnector* child = nullptr;
+        child = BaseConnector::GetChild(connectorPath, type, dataType);
         if (child == nullptr)
         {
             if (type == ConnectorType::eOutput)
@@ -253,8 +253,8 @@ namespace ModelController
     //!
     //! @brief Construct a new MQTTClient::MQTTClient object
     //!
-    MQTTClient::MQTTClient(std::string name, JsonObject config, Connector* parent)
-        : Connector(name, config, parent, ConnectorType::eNone, ConnectorDataType::eNone),
+    MQTTClient::MQTTClient(std::string name, JsonObject config, BaseConnector* parent)
+        : BaseConnector(name, config, parent, ConnectorType::eNone, ConnectorDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
         loopListener([&](){ Serial.println("MQTT loop"); this->client.loop(); }, 0)

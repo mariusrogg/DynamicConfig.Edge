@@ -63,7 +63,7 @@ namespace ModelController
     //!
     //! @brief Construct a new Onboard PWM object
     //!
-    OnboardPWM::OnboardPWM(std::string name, JsonObject config, Connector* parent)
+    OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseConnector* parent)
         : BaseOutputConnector<double>(name, config, parent)
     {
         channel = GetFreeChannel();

@@ -8,7 +8,7 @@
 #pragma once
 
 #include "PubSubClient.h"
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 #include "WiFi.h"
 #include <map>
 #include "MQTTInput.hpp"
@@ -18,7 +18,7 @@
 
 namespace ModelController
 {
-    class MQTTClient : public Connector
+    class MQTTClient : public BaseConnector
     {
         private:
             //!
@@ -88,9 +88,9 @@ namespace ModelController
             //! @param connectorPath Path of the child
             //! @param type ConnectorType of the child
             //! @param dataType ConnectorDataType of the child
-            //! @return Connector* Child, nullptr if not found
+            //! @return BaseConnector* Child, nullptr if not found
             //!
-            virtual Connector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined) override;
+            virtual BaseConnector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined) override;
         public:
             //!
             //! @brief Name of the type for config
@@ -103,7 +103,7 @@ namespace ModelController
             //! @param config Config of the connection
             //! @param parent Parent of the MQTTClient-Connection (normally pass this)
             //!
-            MQTTClient(std::string name, JsonObject config, Connector* parent = nullptr);
+            MQTTClient(std::string name, JsonObject config, BaseConnector* parent = nullptr);
             //!
             //! @brief Publish topic to mqtt broker
             //!

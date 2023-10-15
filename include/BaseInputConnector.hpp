@@ -6,13 +6,13 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 #include "EventHandling.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseInputConnector : public Connector
+    class BaseInputConnector : public BaseConnector
     {
         private:
             //!
@@ -47,8 +47,8 @@ namespace ModelController
             //! @param config Config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseInputConnector(std::string name, JsonObject config, Connector* parent = nullptr)
-                : Connector(name, config, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
+            BaseInputConnector(std::string name, JsonObject config, BaseConnector* parent = nullptr)
+                : BaseConnector(name, config, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Construct a new Base Input Connector object
@@ -56,8 +56,8 @@ namespace ModelController
             //! @param name Name of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseInputConnector(std::string name, Connector* parent = nullptr)
-                : Connector(name, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
+            BaseInputConnector(std::string name, BaseConnector* parent = nullptr)
+                : BaseConnector(name, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
             { }
             //!
             //! @brief Get the actual value set to input

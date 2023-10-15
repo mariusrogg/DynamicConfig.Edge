@@ -1,11 +1,11 @@
 //!
-//! @file Connector.cpp
+//! @file BaseConnector.cpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Implementation of the connector
 //!
 //! @copyright Copyright (c) 2023
 //!
-#include "Connector.hpp"
+#include "BaseConnector.hpp"
 #include <sstream>
 #include "LittleFS.h"
 #include "OnboardPWM.hpp"
@@ -19,7 +19,7 @@ namespace ModelController
     //!
     //! @brief Switch through possible types and return type as string
     //!
-    std::string Connector::TypeToString(ConnectorType type)
+    std::string BaseConnector::TypeToString(ConnectorType type)
     {
         std::string name;
         switch (type)
@@ -44,7 +44,7 @@ namespace ModelController
     //!
     //! @brief Switch through possible datatypes and return data type as string
     //!
-    std::string Connector::DataTypeToString(ConnectorDataType dataType)
+    std::string BaseConnector::DataTypeToString(ConnectorDataType dataType)
     {
         std::string name;
         switch (dataType)
@@ -99,28 +99,28 @@ namespace ModelController
     //!
     //! @brief Returns connectorType
     //!
-    Connector::ConnectorType Connector::GetType() const
+    BaseConnector::ConnectorType BaseConnector::GetType() const
     {
         return connectorType;
     }
     //!
     //! @brief Returns connectorDataType
     //!
-    Connector::ConnectorDataType Connector::GetDataType() const
+    BaseConnector::ConnectorDataType BaseConnector::GetDataType() const
     {
         return connectorDataType;
     }
     //!
     //! @brief Returns child of the connector
     //!
-    Connector* Connector::GetChild(std::string connectorPath, ConnectorType type, ConnectorDataType dataType)
+    BaseConnector* BaseConnector::GetChild(std::string connectorPath, ConnectorType type, ConnectorDataType dataType)
     {
         //! @brief Trim '/' at start of path
         connectorPath = connectorPath.substr(connectorPath.find_first_not_of('/'));
-        Connector* connector = nullptr;
+        BaseConnector* connector = nullptr;
         std::string subPath = "";
         //! @brief Iterate through children
-        for (Connector* child : children)
+        for (BaseConnector* child : children)
         {
             std::string name = child->GetName();
             size_t posName = connectorPath.find(name);
@@ -164,7 +164,7 @@ namespace ModelController
     //!
     //! @brief Check possible type infos and return corresponding data type
     //!
-    Connector::ConnectorDataType Connector::GetDataTypeById(const std::type_info& typeInfo)
+    BaseConnector::ConnectorDataType BaseConnector::GetDataTypeById(const std::type_info& typeInfo)
     {
         ConnectorDataType type = ConnectorDataType::eUndefined;
         if (typeInfo.hash_code() == typeid(double).hash_code())
@@ -220,16 +220,16 @@ namespace ModelController
     //!
     //! @brief Path to the configuration path
     //!
-    std::string Connector::configFilePath = Connector::defaultConfigFile;
+    std::string BaseConnector::configFilePath = BaseConnector::defaultConfigFile;
     //!
     //! @brief Root connector
     //!
-    Connector* Connector::rootConnector = nullptr;
+    BaseConnector* BaseConnector::rootConnector = nullptr;
     //!
     //! @brief Construct a new Connector object
     //!
-    Connector::Connector(string name, JsonObject config, Connector* parent, ConnectorType connectorType, ConnectorDataType dataType)
-        : Connector(name, parent, connectorType, dataType)
+    BaseConnector::BaseConnector(string name, JsonObject config, BaseConnector* parent, ConnectorType connectorType, ConnectorDataType dataType)
+        : BaseConnector(name, parent, connectorType, dataType)
     {
         for (JsonPair child : config)
         {
@@ -240,15 +240,11 @@ namespace ModelController
             }
         }
     }
-    Connector::Connector(string name, Connector* parent, ConnectorType connectorType, ConnectorDataType dataType)
+    BaseConnector::BaseConnector(string name, BaseConnector* parent, ConnectorType connectorType, ConnectorDataType dataType)
         : parent(parent),
         connectorType(connectorType),
         connectorDataType(dataType)
     {
-        // Serial.print("Type in Connector: ");
-        // Serial.println(DataTypeToString(this->connectorDataType).c_str());
-        // Serial.print("Passed type: ");
-        // Serial.println(DataTypeToString(dataType).c_str());
         this->name = name.substr(name.find_first_not_of("/"));
         this->path = (GetParent() != nullptr ? GetParent()->GetPath() : "") + "/" + this->name;
         if (parent)
@@ -259,7 +255,7 @@ namespace ModelController
     //!
     //! @brief Destruction the Connector object
     //!
-    Connector::~Connector()
+    BaseConnector::~BaseConnector()
     {
         if (parent)
         {
@@ -269,30 +265,30 @@ namespace ModelController
     //!
     //! @brief Returns parent of the actual object
     //!
-    Connector* Connector::GetParent() const
+    BaseConnector* BaseConnector::GetParent() const
     {
         return parent;
     }
     //!
     //! @brief Returns path of the actual object
     //!
-    string Connector::GetPath() const
+    string BaseConnector::GetPath() const
     {
         return path;
     }
     //!
     //! @brief Returns name of the actual object
     //!
-    string Connector::GetName() const
+    string BaseConnector::GetName() const
     {
         return name;
     }
     //!
     //! @brief Generates connector from json
     //!
-    Connector* Connector::GenerateConnector(string name, JsonObject connectorConfig, Connector* parent)
+    BaseConnector* BaseConnector::GenerateConnector(string name, JsonObject connectorConfig, BaseConnector* parent)
     {
-        Connector* connector = nullptr;
+        BaseConnector* connector = nullptr;
         if (connectorConfig["type"].is<string>())
         {
             string type = connectorConfig["type"].as<string>();
@@ -310,10 +306,10 @@ namespace ModelController
     //!
     //! @brief Get config of the connector and it's children
     //!
-    string Connector::GetConfig()
+    string BaseConnector::GetConfig()
     {
         stringstream config;
-        for (std::vector<Connector*>::iterator it = children.begin(); it != children.end(); it++)
+        for (std::vector<BaseConnector*>::iterator it = children.begin(); it != children.end(); it++)
         {
             if (it != children.begin())
             {
@@ -326,7 +322,7 @@ namespace ModelController
     //!
     //! @brief Update config of the controller
     //!
-    void Connector::UpdateConfig(JsonObject config)
+    void BaseConnector::UpdateConfig(JsonObject config)
     {
         if (rootConnector != nullptr)
         {
@@ -349,12 +345,12 @@ namespace ModelController
 
         WiFiHandler::SetSSIDPassword(cnf["wifi"]["ssid"], cnf["wifi"]["password"]);
 
-        rootConnector = new Connector(hwName, cnf);
+        rootConnector = new BaseConnector(hwName, cnf);
 
         std::string connectors = "{ \"" + rootConnector->GetName() + "\": {" + rootConnector->GetConfig() + "}}";
 
         // ToDo: Override file on change
-        // File file = LittleFS.open(Connector::configFilePath.c_str(), FILE_WRITE);
+        // File file = LittleFS.open(BaseConnector::configFilePath.c_str(), FILE_WRITE);
         // if (!file)
         // {
         //     return;
@@ -365,10 +361,10 @@ namespace ModelController
     //!
     //! @brief Initially build config
     //!
-    void Connector::InitConfig(std::string configFilePath)
+    void BaseConnector::InitConfig(std::string configFilePath)
     {
-        Connector::configFilePath = configFilePath;
-        File file = LittleFS.open(Connector::configFilePath.c_str(), FILE_READ);
+        BaseConnector::configFilePath = configFilePath;
+        File file = LittleFS.open(BaseConnector::configFilePath.c_str(), FILE_READ);
         DynamicJsonDocument jsonDoc(32768);
 
         deserializeJson(jsonDoc, file);
