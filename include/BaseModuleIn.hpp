@@ -73,10 +73,10 @@ namespace ModelController
             //!
             //! @tparam DT Underlying (primitive) type of the input connector
             //! @param connectorPath Path of the input connector
-            //! @return BaseModuleIn<DT> InputConnector with path
+            //! @return BaseModuleIn<DT>* InputConnector with path
             //!
             template<class DT>
-            static BaseModuleIn<DT> GetModuleInput(std::string connectorPath)
+            static BaseModuleIn<DT>* GetModuleInput(std::string connectorPath)
             {
                 return GetModule<BaseModuleIn<DT>>(connectorPath, ModuleType::eInput, GetDataTypeById(typeid(DT)));
             }

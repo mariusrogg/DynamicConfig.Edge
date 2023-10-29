@@ -61,10 +61,10 @@ namespace ModelController
             //!
             //! @tparam DT Underlying (primitive) type of the output connector
             //! @param connectorPath Path of the output connector
-            //! @return BaseModuleOut<DT> OutputConnector with path
+            //! @return BaseModuleOut<DT>* OutputConnector with path
             //!
             template<class DT>
-            static BaseModuleOut<DT> GetModuleOutput(std::string connectorPath)
+            static BaseModuleOut<DT>* GetModuleOutput(std::string connectorPath)
             {
                 return GetModule<BaseModuleOut<DT>>(connectorPath, ModuleType::eOutput, GetDataTypeById(typeid(DT)));
             }
