@@ -7,19 +7,13 @@
 //!
 #pragma once
 #include "BaseConnector.hpp"
-#include "EventHandling.hpp"
+#include "BaseModuleIn.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseOutputConnector : public BaseConnector
+    class BaseOutputConnector : public BaseModuleIn<T>, public BaseConnector
     {
-        private:
-            //!
-            //! @brief Actual value (set to output)
-            //!
-            T actualValue = 0;
-
         protected:
             //!
             //! @brief Set value of the output
@@ -29,6 +23,13 @@ namespace ModelController
             //! @return false Value could not be set to output
             //!
             virtual bool SetOutputValue(T value) = 0;
+            //!
+            //! @brief Call SetOutputValue for easier use in derived classes
+            //!
+            virtual bool SetIntputValue(T value) override final
+            {
+                return SetOutputValue(value);
+            }
 
         public:
             //!
@@ -42,8 +43,9 @@ namespace ModelController
             //! @param config Config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseOutputConnector(std::string name, JsonObject config, BaseConnector* parent = nullptr)
-                : BaseConnector(name, config, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
+            BaseOutputConnector(std::string name, JsonObject config, BaseModule* parent = nullptr)
+                : BaseModuleIn<T>(name, parent),
+                BaseConnector(name, config, parent)
             { }
             //!
             //! @brief Construct a new Base Output object
@@ -51,34 +53,10 @@ namespace ModelController
             //! @param name Name of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseOutputConnector(std::string name, BaseConnector* parent = nullptr)
-                : BaseConnector(name, parent, ConnectorType::eOutput, GetDataTypeById(typeid(T)))
+            BaseOutputConnector(std::string name, BaseModule* parent = nullptr)
+                : BaseModuleIn<T>(name, parent),
+                BaseConnector(name, parent)
             { }
-            //!
-            //! @brief Set the target value for the output
-            //!
-            //! @param value Target value for output
-            //!
-            void SetValue(T value)
-            {
-                if (actualValue != value)
-                {
-                    if (SetOutputValue(value))
-                    {
-                        actualValue = value;
-                        ValueChangedEvent(GetValue());
-                    }
-                }
-            }
-            //!
-            //! @brief Get the actual value set to output
-            //!
-            //! @return T Actual value
-            //!
-            T GetValue() const
-            {
-                return actualValue;
-            }
             //!
             //! @brief Get the output connector by path
             //!
@@ -89,7 +67,7 @@ namespace ModelController
             template<class DT>
             static BaseOutputConnector<DT> GetOutputConnector(std::string connectorPath)
             {
-                return GetConnector<BaseOutputConnector<DT>>(connectorPath, ConnectorType::eOutput, GetDataTypeById(typeid(T)));
+                return dynamic_cast<BaseOutputConnector<DT>>(BaseModuleIn<T>::GetModuleInput(connectorPath));
             }
     };
 } // namespace ModelController

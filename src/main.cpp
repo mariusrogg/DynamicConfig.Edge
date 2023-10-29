@@ -7,6 +7,7 @@
 #include "MQTTInput.hpp"
 #include "MQTTClient.hpp"
 #include "LoopEvent.hpp"
+#include "Logger.hpp"
 
 ModelController::Event<std::string> event;
 void callback1(std::string val)
@@ -36,41 +37,39 @@ ModelController::LoopEvent::LoopListener* loopListener;
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("\n\n");
-    Serial.println("started");
-    Serial.println("\n\n");
+    Logger::info("started");
 
     // Check if Filesystem was initialized
     if (!LittleFS.begin(false, ""))
     {
-        Serial.println("LittleFS Mount Failed");
+        Logger::fatal("LittleFS failed");
         return;
     }
     File connectors = LittleFS.open(ModelController::BaseConnector::defaultConfigFile);
     Serial.println(connectors.readString().c_str());
     connectors.close();
 
-    ModelController::BaseConnector::InitConfig();
+    ModelController::BaseModule::InitConfig();
 
     event += callback1;
     event += callback2;
 
-    Serial.print("Double: ");
-    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(double))).c_str());
-    Serial.print("String: ");
-    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(std::string))).c_str());
-    Serial.print("Bool: ");
-    Serial.println(ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(bool))).c_str());
+    Logger::debug("Double: " + ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(double))));
+    Logger::debug("String: " + ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(std::string))));
+    Logger::debug("Bool: " + ModelController::BaseConnector::DataTypeToString(ModelController::BaseConnector::GetDataTypeById(typeid(bool))));
 
     // loopListener = new ModelController::LoopEvent::LoopListener(loopCallback, 2);
-    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
-    Serial.println(ModelController::BaseConnector::DataTypeToString(mqttDbl->GetDataType()).c_str());
-    ModelController::MQTTInput<double>* mqttDblCpy = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
+    std::string path = "/mqtt/in/double";
+    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>(path, ModelController::BaseModule::ModuleType::eOutput, ModelController::BaseModule::ModuleDataType::eDouble);
+    // Serial.println(ModelController::BaseConnector::DataTypeToString(mqttDbl->GetDataType()).c_str());
+    ModelController::MQTTInput<double>* mqttDblCpy = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>(path, ModelController::BaseModule::ModuleType::eOutput, ModelController::BaseModule::ModuleDataType::eDouble);
 }
 
 int i = 0;
 void loop()
 {
+    Logger::debug("start loop");
+    Serial.println("Test");
     ModelController::LoopEvent::Raise();
     WiFiHandler::Check();
 
@@ -86,16 +85,18 @@ void loop()
         listener3 = nullptr;
         i = 0;
     }
-    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>("/mqtt/in/double", ModelController::BaseConnector::ConnectorType::eInput, ModelController::BaseConnector::ConnectorDataType::eDouble);
+
+    std::string path = "/mqtt/in/double";
+    ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>(path, ModelController::BaseModule::ModuleType::eOutput, ModelController::BaseModule::ModuleDataType::eDouble);
     double value = mqttDbl->GetValue();
-    Serial.print("MQTT in: ");
-    Serial.println(value);
+    Logger::debug("MQTT in: " + std::to_string(value));
     ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_0")->SetValue(100.0);
-    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(100.0);
-    ModelController::MQTTOutput<int32_t>* mqttInt = ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<int32_t>>("/mqtt/test/value", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eInt32);
+    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(value);
+    ModelController::MQTTOutput<int32_t>* mqttInt = ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<int32_t>>("/mqtt/test/value", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eInt32);
     mqttInt->SetValue(i);
-    ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<double>>("/mqtt/const/twenty", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eDouble)->SetValue(20);
-    // ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<std::string>>("/mqtt/const/string", ModelController::BaseConnector::ConnectorType::eOutput, ModelController::BaseConnector::ConnectorDataType::eString)->SetValue("string");
+    ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<double>>("/mqtt/const/twenty", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eDouble)->SetValue(20);
+    // ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<std::string>>("/mqtt/const/string", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eString)->SetValue("string");
 
     sleep(1);
+    Logger::debug("end loop");
 }

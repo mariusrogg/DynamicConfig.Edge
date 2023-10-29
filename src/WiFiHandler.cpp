@@ -6,6 +6,7 @@
 //! @copyright Copyright (c) 2023
 //!
 #include "WiFiHandler.hpp"
+#include "Logger.hpp"
 
 unsigned long WiFiHandler::timeout = 5000;
 unsigned long WiFiHandler::timeStarted = 0;
@@ -29,7 +30,7 @@ void WiFiHandler::BeginSTA(const char* ssid, const char* password)
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     timeStarted = millis();
-    Serial.println("Connecting to WiFi ..");
+    Logger::debug("WiFi: Connecting to WiFi");
 }
 //!
 //! @brief Start AP with default values
@@ -53,9 +54,9 @@ bool WiFiHandler::BeginAP(const char* ssid, const char* password)
     IPAddress gateway(192, 168, 0, 1);
     if (!WiFi.config(local_IP, gateway, subnet))
     {
-        Serial.println("STA Failed to configure");
+        Logger::error("WiFi: STA Failed to configure");
     }
-    Serial.println("Starting AP ..");
+    Logger::info("WiFi: Starting AP");
     if (WiFi.softAP(ssid, password))
     {
         APInitialized.Raise();
@@ -84,7 +85,7 @@ bool WiFiHandler::Check()
             reconnects = 0;
             if (!staConnected)
             {
-                Serial.println("STA Connected");
+                Logger::info("WiFi: STA Connected");
                 STAConnected.Raise();
                 staConnected = true;
             }
@@ -104,7 +105,7 @@ bool WiFiHandler::Check()
             //!
             else
             {
-                Serial.println("Try Reconnect");
+                Logger::warning("WiFi: Try Reconnect");
                 retVal = false;
                 WiFi.reconnect();
                 timeStarted = millis();

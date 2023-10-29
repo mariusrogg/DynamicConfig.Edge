@@ -7,34 +7,14 @@
 //!
 #pragma once
 #include "BaseConnector.hpp"
+#include "BaseModuleOut.hpp"
 #include "EventHandling.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseInputConnector : public BaseConnector
+    class BaseInputConnector : public BaseModuleOut<T>, public BaseConnector
     {
-        private:
-            //!
-            //! @brief Actual value (read from input)
-            //!
-            T actualValue = 0;
-
-        protected:
-            //!
-            //! @brief Set the target value for the input
-            //!
-            //! @param value Target value for input
-            //!
-            void SetValue(T value)
-            {
-                if (actualValue != value)
-                {
-                    actualValue = value;
-                    ValueChangedEvent(GetValue());
-                }
-            }
-
         public:
             //!
             //! @brief Event raised, if value changed
@@ -47,8 +27,9 @@ namespace ModelController
             //! @param config Config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseInputConnector(std::string name, JsonObject config, BaseConnector* parent = nullptr)
-                : BaseConnector(name, config, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
+            BaseInputConnector(std::string name, JsonObject config, BaseModule* parent = nullptr)
+                : BaseModuleOut<T>(name, parent),
+                BaseConnector(name, config, parent)
             { }
             //!
             //! @brief Construct a new Base Input Connector object
@@ -56,18 +37,10 @@ namespace ModelController
             //! @param name Name of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseInputConnector(std::string name, BaseConnector* parent = nullptr)
-                : BaseConnector(name, parent, ConnectorType::eInput, GetDataTypeById(typeid(T)))
+            BaseInputConnector(std::string name, BaseModule* parent = nullptr)
+                : BaseModuleOut<T>(name, parent),
+                BaseConnector(name, parent)
             { }
-            //!
-            //! @brief Get the actual value set to input
-            //!
-            //! @return T Actual value
-            //!
-            T GetValue() const
-            {
-                return actualValue;
-            }
             //!
             //! @brief Get the input connector by path
             //!
@@ -78,7 +51,7 @@ namespace ModelController
             template<class DT>
             static BaseInputConnector<DT> GetInputConnector(std::string connectorPath)
             {
-                return GetConnector<BaseInputConnector<DT>>(connectorPath, ConnectorType::eInput, GetDataTypeById(typeid(T)));
+                return dynamic_cast<BaseInputConnector<DT>>(BaseModuleOut<T>::GetModuleOutput(connectorPath));
             }
     };
 } // namespace ModelController

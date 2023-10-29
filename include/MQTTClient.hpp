@@ -86,11 +86,11 @@ namespace ModelController
             //! @brief Get child of the object
             //!
             //! @param connectorPath Path of the child
-            //! @param type ConnectorType of the child
-            //! @param dataType ConnectorDataType of the child
-            //! @return BaseConnector* Child, nullptr if not found
+            //! @param type ModuleType of the child
+            //! @param dataType ModuleDataType of the child
+            //! @return BaseModule* Child, nullptr if not found
             //!
-            virtual BaseConnector* GetChild(std::string connectorPath, ConnectorType type = ConnectorType::eUndefined, ConnectorDataType dataType = ConnectorDataType::eUndefined) override;
+            virtual BaseModule* GetChild(std::string connectorPath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined) override;
         public:
             //!
             //! @brief Name of the type for config

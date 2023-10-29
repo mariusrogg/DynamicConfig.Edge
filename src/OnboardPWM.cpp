@@ -7,6 +7,8 @@
 //!
 #include "OnboardPWM.hpp"
 #include <sstream>
+#include "Logger.hpp"
+
 namespace ModelController
 {
     //!
@@ -43,7 +45,6 @@ namespace ModelController
                 ledcDetachPin(*it);
                 ledcAttachPin(*it, channel);
             }
-            Serial.println();
         }
     }
     //!
@@ -66,6 +67,8 @@ namespace ModelController
     OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseConnector* parent)
         : BaseOutputConnector<double>(name, config, parent)
     {
+        Logger::trace("OnboardPWM::OnboardPWM(" + name + ", jsonConfig,  " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
+
         channel = GetFreeChannel();
         if (channel >= 0)
         {
@@ -79,8 +82,8 @@ namespace ModelController
             {
                 if (it->is<uint8_t>())
                 {
-                    Serial.println(it->as<uint8_t>());
                     this->pins.push_back(it->as<uint8_t>());
+                    Logger::trace("Pin " + std::to_string(it->as<uint8_t>()) + " added to OnboardPWM " + GetPath());
                 }
             }
         }
