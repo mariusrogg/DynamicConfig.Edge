@@ -47,7 +47,7 @@ void Logger::log(Level level, std::string message, bool logAlways)
 {
     if (level <= minLevel || logAlways)
     {
-        Serial.print((millis() + "\t" + LevelToString(level) + "\t - ").c_str());
+        Serial.print((std::to_string(millis()) + "\t" + LevelToString(level) + "\t - ").c_str());
         Serial.println(message.c_str());
     }
 }
