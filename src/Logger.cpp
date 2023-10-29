@@ -43,7 +43,7 @@ std::string Logger::LevelToString(Level level)
 //!
 //! @brief Create log message with timestamp, level and message
 //!
-void Logger::log(Level level, std::string message, bool logAlways = false)
+void Logger::log(Level level, std::string message, bool logAlways)
 {
     if (level <= minLevel || logAlways)
     {
