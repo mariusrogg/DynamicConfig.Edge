@@ -1,7 +1,7 @@
 //!
-//! @file IBaseModuleOut.hpp
+//! @file IBaseModuleIn.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
-//! @brief Interface for output module
+//! @brief Interface for input module
 //!
 //! @copyright Copyright (c) 2023
 //!
@@ -11,7 +11,7 @@
 
 namespace ModelController
 {
-    class IBaseModuleOut : public virtual BaseModule
+    class IBaseModuleIn : public virtual BaseModule
     {
         public:
             //!
@@ -19,8 +19,8 @@ namespace ModelController
             //!
             static std::string wildcardSuffix;
             //!
-            //! @brief Event raised, if new ModuleOut was created
+            //! @brief Event raised, if new ModuleIn was created
             //!
-            static Event<std::string> ModuleOutCreated;
+            static Event<std::string> ModuleInCreated;
     };
 } // namespace ModelController

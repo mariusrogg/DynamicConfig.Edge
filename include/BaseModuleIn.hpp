@@ -6,14 +6,17 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseModule.hpp"
+#include "IBaseModuleIn.hpp"
 #include "EventHandling.hpp"
 #include "BaseModuleOut.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseModuleIn : public virtual BaseModule
+    class BaseModuleOut;
+
+    template <typename T>
+    class BaseModuleIn : public IBaseModuleIn
     {
         private:
             //!
@@ -35,7 +38,7 @@ namespace ModelController
             //!
             //! @brief Callback called, if new output was created, to listen to output changed event
             //!
-            //! @param pathCreatedOutput
+            //! @param pathCreatedOutput Path of the created output
             //!
             void OnOutputCreated(std::string pathCreatedOutput)
             {
@@ -72,9 +75,9 @@ namespace ModelController
                     if (connectedOutput != nullptr)
                     {
                         //! Listen to ValueChangedEvent of connected output and delete OnModuleOutCreated, that the listener does not get called anymore
-                        OnOutputChanged = new typename Event<T>::Listener(&(connectedOutput->ValueChangedEvent), [&](T value){ this->SetValue(value); } );
                         delete OnModuleOutCreated;
                         OnModuleOutCreated = nullptr;
+                        SetOutputChangedEvent(&(connectedOutput->ValueChangedEvent));
                     }
                     //! Create Listener to ModuleOutCreated event, if no matching connectedOutput was found
                     else if (OnModuleOutCreated == nullptr)
@@ -115,6 +118,7 @@ namespace ModelController
                 {
                     OnOutputCreated(pathConnectedModuleOut);
                 }
+                ModuleInCreated(this->GetPath());
             }
             //!
             //! @brief Construct a new input module
@@ -131,6 +135,34 @@ namespace ModelController
                 {
                     OnOutputCreated(pathConnectedModuleOut);
                 }
+                ModuleInCreated(this->GetPath());
+            }
+            //!
+            //! @brief Destruction of the Base Module In object
+            //!
+            virtual ~BaseModuleIn()
+            {
+                delete OnOutputChanged;
+                delete OnModuleOutCreated;
+            }
+            //!
+            //! @brief Set the Listener for OutputChagnedEvent
+            //!
+            //! @param event Event to listen to
+            //!
+            //! @return true Event was set successfully
+            //! @return false Event could not be set
+            //!
+            bool SetOutputChangedEvent(Event<T>* event)
+            {
+                bool retVal = false;
+                //! Prevent, that OnOuputChanged is set by output, while object is waiting for creation of connected output
+                if (OnOutputChanged == nullptr && OnModuleOutCreated == nullptr)
+                {
+                    OnOutputChanged = new typename Event<T>::Listener(event, [&](T value){ this->SetValue(value); } );
+                    retVal = true;
+                }
+                return retVal;
             }
             //!
             //! @brief Set the target value for the output

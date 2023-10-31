@@ -48,5 +48,16 @@ namespace ModelController
             publish(publish)
         {
         }
+        //!
+        //! @brief Construct a new MQTTOutput object
+        //!
+        //! @param name Name of the connector
+        //! @param publish Function pointer to publish function of MQTT client
+        //! @param parent Parent of the Connector (normally pass this)
+        //!
+        MQTTOutput(std::string name, std::function<bool(std::string, std::string)> publish, BaseConnector* parent = nullptr)
+            : MQTTOutput<T>(name, publish, "", parent)
+        {
+        }
     };
 } // namespace ModelController
