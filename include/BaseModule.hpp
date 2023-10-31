@@ -195,6 +195,9 @@ namespace ModelController
             template<class T>
             static T* GetModule(std::string modulePath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined)
             {
+                //! Remove "/root" or "root" from beginning of the path
+                modulePath = modulePath.substr(modulePath.find_first_not_of('/'));
+                modulePath = modulePath.substr(modulePath.find_first_not_of("root"));
                 return rootModule == nullptr ? nullptr : rootModule->GetChildModule<T>(modulePath, type, dataType);
             }
             //!

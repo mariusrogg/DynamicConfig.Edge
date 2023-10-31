@@ -33,6 +33,21 @@ ModelController::Event<std::string>::Listener listener1(&event, callback1);
 ModelController::Event<std::string>::Listener listener2(&event, callback2);
 ModelController::Event<std::string>::Listener* listener3 = nullptr;
 ModelController::LoopEvent::LoopListener* loopListener;
+void OnModuleOutCreated(std::string modulePath)
+{
+    Logger::trace("OnModuleOutCreated(" + modulePath + ")");
+    ModelController::BaseModuleOut<double>* module = ModelController::BaseModule::GetModule<ModelController::BaseModuleOut<double>>(modulePath);
+    if (module != nullptr)
+    {
+        Logger::trace("ModuleOut created - path:     " + module->GetPath());
+        Logger::trace("ModuleOut created - type:     " + ModelController::BaseModule::TypeToString(module->GetType()));
+        Logger::trace("ModuleOut created - dataType: " + ModelController::BaseModule::DataTypeToString(module->GetDataType()));
+    }
+    else
+    {
+        Logger::trace("ModuleOut created - nullptr");
+    }
+}
 
 void setup()
 {
@@ -48,6 +63,8 @@ void setup()
     File connectors = LittleFS.open(ModelController::BaseConnector::defaultConfigFile);
     Serial.println(connectors.readString().c_str());
     connectors.close();
+
+    ModelController::BaseModuleOut<double>::ModuleOutCreated.AddCallback(OnModuleOutCreated);
 
     ModelController::BaseModule::InitConfig();
 
@@ -90,13 +107,12 @@ void loop()
     ModelController::MQTTInput<double>* mqttDbl = ModelController::BaseConnector::GetConnector<ModelController::MQTTInput<double>>(path, ModelController::BaseModule::ModuleType::eOutput, ModelController::BaseModule::ModuleDataType::eDouble);
     double value = mqttDbl->GetValue();
     Logger::debug("MQTT in: " + std::to_string(value));
-    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_0")->SetValue(100.0);
-    ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(value);
+    // ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_0")->SetValue(100.0);
+    // ModelController::BaseConnector::GetConnector<ModelController::OnboardPWM>("/PWM_1")->SetValue(value);
     ModelController::MQTTOutput<int32_t>* mqttInt = ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<int32_t>>("/mqtt/test/value", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eInt32);
     mqttInt->SetValue(i);
     ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<double>>("/mqtt/const/twenty", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eDouble)->SetValue(20);
     // ModelController::BaseConnector::GetConnector<ModelController::MQTTOutput<std::string>>("/mqtt/const/string", ModelController::BaseModule::ModuleType::eInput, ModelController::BaseModule::ModuleDataType::eString)->SetValue("string");
 
-    sleep(1);
     Logger::debug("end loop");
 }

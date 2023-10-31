@@ -285,6 +285,8 @@ namespace ModelController
         }
         client.setServer(serverHostname.c_str(), serverPort);
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
+
+        IBaseModuleOut::ModuleOutCreated(this->GetPath() + "/*");
     }
     //!
     //! @brief Calls publish from PubSubClient

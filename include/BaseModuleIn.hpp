@@ -8,17 +8,81 @@
 #pragma once
 #include "BaseModule.hpp"
 #include "EventHandling.hpp"
+#include "BaseModuleOut.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseModuleIn : virtual BaseModule
+    class BaseModuleIn : public virtual BaseModule
     {
         private:
             //!
             //! @brief Actual value of the input
             //!
             T actualValue = 0;
+            //!
+            //! @brief Path to the connected output module
+            //!
+            std::string pathConnectedModuleOut;
+            //!
+            //! @brief Listener called, if value of connected output changed
+            //!
+            typename Event<T>::Listener* OnOutputChanged = nullptr;
+            //!
+            //! @brief Listener called, if new output module was created
+            //!
+            Event<std::string>::Listener* OnModuleOutCreated = nullptr;
+            //!
+            //! @brief Callback called, if new output was created, to listen to output changed event
+            //!
+            //! @param pathCreatedOutput
+            //!
+            void OnOutputCreated(std::string pathCreatedOutput)
+            {
+                Logger::trace("BaseModuleIn::OnOutputCreated(" + pathCreatedOutput + ") - Module: " + this->GetPath());
+                bool outputAvailable = pathCreatedOutput == pathConnectedModuleOut;
+
+                Logger::trace("wildcard: \t" + IBaseModuleOut::wildcardSuffix);
+                Logger::trace("pathCreatedOutput: \t" + pathCreatedOutput);
+                Logger::trace("pathConnectedModuleOut: \t" + pathConnectedModuleOut);
+
+                size_t wildcardSize = IBaseModuleOut::wildcardSuffix.size();
+                size_t pathCreatedOutputSize = pathCreatedOutput.size();
+                size_t pathConnectedModuleOutSize = pathConnectedModuleOut.size();
+
+                Logger::trace("wildcardSize: \t" + std::to_string(wildcardSize));
+                Logger::trace("pathCreatedOutputSize: \t" + std::to_string(pathCreatedOutputSize));
+                Logger::trace("pathConnectedModuleOutSize: \t" + std::to_string(pathConnectedModuleOutSize));
+
+                //! Check if pathCreatedOutput ends with wildcard and pathConnectedModuleOut is child of pathCreatedOutput
+                if (!outputAvailable
+                    && pathConnectedModuleOutSize >= pathCreatedOutputSize - wildcardSize
+                    && pathCreatedOutputSize > wildcardSize
+                    && pathCreatedOutput.compare(pathCreatedOutputSize - wildcardSize, wildcardSize, IBaseModuleOut::wildcardSuffix) == 0
+                    && pathConnectedModuleOut.compare(0, pathCreatedOutputSize - wildcardSize, pathCreatedOutput.substr(0, pathCreatedOutputSize - wildcardSize)) == 0)
+                {
+                    outputAvailable = true;
+                }
+
+                //! Only set listener, if not set yet
+                if (OnOutputChanged == nullptr && outputAvailable)
+                {
+                    //! Find connected output
+                    BaseModuleOut<T>* connectedOutput = BaseModuleOut<T>::GetModuleOutput(pathConnectedModuleOut);
+                    if (connectedOutput != nullptr)
+                    {
+                        //! Listen to ValueChangedEvent of connected output and delete OnModuleOutCreated, that the listener does not get called anymore
+                        OnOutputChanged = new typename Event<T>::Listener(&(connectedOutput->ValueChangedEvent), [&](T value){ this->SetValue(value); } );
+                        delete OnModuleOutCreated;
+                        OnModuleOutCreated = nullptr;
+                    }
+                    //! Create Listener to ModuleOutCreated event, if no matching connectedOutput was found
+                    else if (OnModuleOutCreated == nullptr)
+                    {
+                        OnModuleOutCreated = new Event<std::string>::Listener(&IBaseModuleOut::ModuleOutCreated, [&](std::string path){ this->OnOutputCreated(path); } );
+                    }
+                }
+            }
         protected:
             //!
             //! @brief Set value of the input
@@ -37,11 +101,36 @@ namespace ModelController
             //! @brief Construct a new input module
             //!
             //! @param name Name of the connector
+            //! @param config Json config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseModuleIn(std::string name, BaseModule* parent = nullptr)
+            BaseModuleIn(std::string name, JsonObject config, BaseModule* parent = nullptr)
             {
                 Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
+                if (config["connectedOut"].is<std::string>())
+                {
+                    pathConnectedModuleOut = config["connectedOut"].as<std::string>();
+                }
+                if (!pathConnectedModuleOut.empty())
+                {
+                    OnOutputCreated(pathConnectedModuleOut);
+                }
+            }
+            //!
+            //! @brief Construct a new input module
+            //!
+            //! @param name Name of the connector
+            //! @param pathConnectedModuleOut Path of the connected output
+            //! @param parent Parent of the Connector (normally pass this)
+            //!
+            BaseModuleIn(std::string name, std::string pathConnectedModuleOut, BaseModule* parent = nullptr)
+                : pathConnectedModuleOut(pathConnectedModuleOut)
+            {
+                Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
+                if (!pathConnectedModuleOut.empty())
+                {
+                    OnOutputCreated(pathConnectedModuleOut);
+                }
             }
             //!
             //! @brief Set the target value for the output
@@ -71,14 +160,12 @@ namespace ModelController
             //!
             //! @brief Get the module input by path
             //!
-            //! @tparam DT Underlying (primitive) type of the input connector
             //! @param connectorPath Path of the input connector
-            //! @return BaseModuleIn<DT>* InputConnector with path
+            //! @return BaseModuleIn<T>* InputConnector with path
             //!
-            template<class DT>
-            static BaseModuleIn<DT>* GetModuleInput(std::string connectorPath)
+            static BaseModuleIn<T>* GetModuleInput(std::string connectorPath)
             {
-                return GetModule<BaseModuleIn<DT>>(connectorPath, ModuleType::eInput, GetDataTypeById(typeid(DT)));
+                return GetModule<BaseModuleIn<T>>(connectorPath, ModuleType::eInput, GetDataTypeById(typeid(T)));
             }
     };
 

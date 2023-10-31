@@ -8,11 +8,12 @@
 #pragma once
 #include "BaseModule.hpp"
 #include "EventHandling.hpp"
+#include "IBaseModuleOut.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseModuleOut : virtual BaseModule
+    class BaseModuleOut : public IBaseModuleOut
     {
         private:
             //!
@@ -33,6 +34,7 @@ namespace ModelController
             BaseModuleOut(std::string name, BaseModule* parent = nullptr)
             {
                 Initialize(name, parent, ModuleType::eOutput, GetDataTypeById(typeid(T)));
+                ModuleOutCreated(this->GetPath());
             }
             //!
             //! @brief Set the target value for the output
@@ -59,14 +61,12 @@ namespace ModelController
             //!
             //! @brief Get the module output by path
             //!
-            //! @tparam DT Underlying (primitive) type of the output connector
             //! @param connectorPath Path of the output connector
-            //! @return BaseModuleOut<DT>* OutputConnector with path
+            //! @return BaseModuleOut<T>* OutputConnector with path
             //!
-            template<class DT>
-            static BaseModuleOut<DT>* GetModuleOutput(std::string connectorPath)
+            static BaseModuleOut<T>* GetModuleOutput(std::string connectorPath)
             {
-                return GetModule<BaseModuleOut<DT>>(connectorPath, ModuleType::eOutput, GetDataTypeById(typeid(DT)));
+                return GetModule<BaseModuleOut<T>>(connectorPath, ModuleType::eOutput, GetDataTypeById(typeid(T)));
             }
     };
 
