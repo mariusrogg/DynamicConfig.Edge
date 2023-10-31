@@ -287,6 +287,7 @@ namespace ModelController
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
 
         IBaseModuleOut::ModuleOutCreated(this->GetPath() + "/*");
+        IBaseModuleIn::ModuleInCreated(this->GetPath() + "/*");
     }
     //!
     //! @brief Calls publish from PubSubClient

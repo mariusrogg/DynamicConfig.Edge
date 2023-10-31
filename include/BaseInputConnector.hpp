@@ -28,17 +28,18 @@ namespace ModelController
             //! @param parent Parent of the Connector (normally pass this)
             //!
             BaseInputConnector(std::string name, JsonObject config, BaseModule* parent = nullptr)
-                : BaseModuleOut<T>(name, parent),
+                : BaseModuleOut<T>(name, config, parent),
                 BaseConnector(name, config, parent)
             { }
             //!
             //! @brief Construct a new Base Input Connector object
             //!
             //! @param name Name of the connector
+            //! @param pathConnectedModuleIn Path of the connected module-input
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseInputConnector(std::string name, BaseModule* parent = nullptr)
-                : BaseModuleOut<T>(name, parent),
+            BaseInputConnector(std::string name, std::string pathConnectedModuleIn, BaseModule* parent = nullptr)
+                : BaseModuleOut<T>(name, pathConnectedModuleIn, parent),
                 BaseConnector(name, parent)
             { }
             //!

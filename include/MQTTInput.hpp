@@ -21,10 +21,21 @@ namespace ModelController
         //! @brief Construct a new MQTTInput object
         //!
         //! @param name Name of the variable (topic without slash at beginning)
+        //! @param pathConnectedModuleIn Path of the connected output
+        //! @param parent Parent of the MQTTInput (MQTTClient)
+        //!
+        MQTTInput(std::string name, std::string pathConnectedModuleIn = "", BaseConnector* parent = nullptr)
+            : BaseInputConnector<T>(name, pathConnectedModuleIn, parent)
+        {
+        }
+        //!
+        //! @brief Construct a new MQTTInput object
+        //!
+        //! @param name Name of the variable (topic without slash at beginning)
         //! @param parent Parent of the MQTTInput (MQTTClient)
         //!
         MQTTInput(std::string name, BaseConnector* parent = nullptr)
-            : BaseInputConnector<T>(name, parent)
+            : MQTTInput<T>(name, "", parent)
         {
         }
         //!
