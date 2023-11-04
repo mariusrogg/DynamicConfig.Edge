@@ -8,6 +8,8 @@
 #pragma once
 #include <list>
 #include <functional>
+#include <iterator>
+#include "Logger.hpp"
 
 namespace ModelController
 {
@@ -82,6 +84,7 @@ namespace ModelController
             void AddListener(Listener* listener)
             {
                 listeners.push_back(listener);
+                Logger::trace("Listener added to event");
             }
             //!
             //! @brief Add callback to callbacks
@@ -91,6 +94,7 @@ namespace ModelController
             void AddCallback(void(*callback)(T...))
             {
                 callbacks.push_back(callback);
+                Logger::trace("Callback added to event");
             }
             //!
             //! @brief Remove listener to listeners
@@ -100,6 +104,7 @@ namespace ModelController
             void RemoveListener(Listener* listener)
             {
                 listeners.remove(listener);
+                Logger::trace("Listener removed from event");
             }
             //!
             //! @brief Remove callback to callbacks
@@ -109,6 +114,7 @@ namespace ModelController
             void RemoveCallback(void(*callback)(T...))
             {
                 callbacks.remove(callback);
+                Logger::trace("Callback removed from event");
             }
             //!
             //! @brief Raise event and call each listeners callback
@@ -117,13 +123,13 @@ namespace ModelController
             //!
             void Raise(T ... args)
             {
-                for (Listener* listener : listeners)
+                for (typename std::list<Listener*>::reverse_iterator i = listeners.rbegin(); i != listeners.rend(); i++)
                 {
-                    listener->call(args...);
+                    (*i)->call(args...);
                 }
-                for (void(*callback)(T...) : callbacks)
+                for (typename std::list<void(*)(T...)>::reverse_iterator i = callbacks.rbegin(); i != callbacks.rend(); i++)
                 {
-                    callback(args...);
+                    (*i)(args...);
                 }
             }
             //!

@@ -8,6 +8,7 @@
 #include "BaseModule.hpp"
 #include "WiFiHandler.hpp"
 #include "BaseConnector.hpp"
+#include "BaseProcessor.hpp"
 #include <sstream>
 #include "LittleFS.h"
 #include "Logger.hpp"
@@ -342,7 +343,18 @@ namespace ModelController
         {
             BaseConnector::rootConnector = new BaseConnector(connectorsName, cnf[connectorsName.c_str()].as<JsonObject>(), rootModule);
         }
-        // ToDo: Do upper stuff for BaseProcessor::rootProcessor
+
+        if (BaseProcessor::rootProcessor != nullptr)
+        {
+            delete BaseProcessor::rootProcessor;
+            BaseProcessor::rootProcessor = nullptr;
+            Logger::trace("Deleted old rootProcessor");
+        }
+        std::string processorsName = "Processors";
+        if (cnf[processorsName.c_str()].is<JsonObject>())
+        {
+            BaseProcessor::rootProcessor = new BaseProcessor(processorsName, cnf[processorsName.c_str()].as<JsonObject>(), rootModule);
+        }
 
         // std::string connectors = "{ \"" + rootConnector->GetName() + "\": {" + rootConnector->GetConfig() + "}}";
 
@@ -361,8 +373,8 @@ namespace ModelController
     void BaseModule::InitConfig(std::string configFilePath)
     {
         Logger::trace("BaseModule::InitConfig(" + configFilePath + ")");
-        BaseConnector::configFilePath = configFilePath;
-        File file = LittleFS.open(BaseConnector::configFilePath.c_str(), FILE_READ);
+        BaseModule::configFilePath = configFilePath;
+        File file = LittleFS.open(BaseModule::configFilePath.c_str(), FILE_READ);
         DynamicJsonDocument jsonDoc(32768);
 
         deserializeJson(jsonDoc, file);

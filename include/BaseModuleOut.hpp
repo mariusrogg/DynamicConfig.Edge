@@ -25,13 +25,14 @@ namespace ModelController
             //!
             T actualValue = 0;
             //!
-            //! @brief Path to the connected output module
-            //!
-            std::string pathConnectedModuleIn;
-            //!
             //! @brief Listener called, if new output module was created
             //!
             Event<std::string>::Listener* OnModuleInCreated = nullptr;
+        protected:
+            //!
+            //! @brief Path to the connected output module
+            //!
+            std::string pathConnectedModuleIn;
             //!
             //! @brief Callback called, if new output was created, to listen to output changed event
             //!
@@ -97,6 +98,7 @@ namespace ModelController
             BaseModuleOut(std::string name, BaseModule* parent = nullptr)
             {
                 Initialize(name, parent, ModuleType::eOutput, GetDataTypeById(typeid(T)));
+                Logger::trace("Raising ModuleOutCreated(" + this->GetPath() + ")");
                 ModuleOutCreated(this->GetPath());
             }
             //!
@@ -114,6 +116,7 @@ namespace ModelController
                 {
                     OnInputCreated(pathConnectedModuleIn);
                 }
+                Logger::trace("Raising ModuleOutCreated(" + this->GetPath() + ")");
                 ModuleOutCreated(this->GetPath());
             }
             //!
@@ -123,17 +126,22 @@ namespace ModelController
             //! @param config Json config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseModuleOut(std::string name, JsonObject config, BaseModule* parent = nullptr)
+            BaseModuleOut(std::string name, JsonVariant config, BaseModule* parent = nullptr)
             {
                 Initialize(name, parent, ModuleType::eOutput, GetDataTypeById(typeid(T)));
-                if (config["connectedIn"].is<std::string>())
+                if (config.is<JsonObject>() && config["connectedIn"].is<std::string>())
                 {
                     pathConnectedModuleIn = config["connectedIn"].as<std::string>();
+                }
+                else if (config.is<std::string>())
+                {
+                    pathConnectedModuleIn = config.as<std::string>();
                 }
                 if (!pathConnectedModuleIn.empty())
                 {
                     OnInputCreated(pathConnectedModuleIn);
                 }
+                Logger::trace("Raising ModuleOutCreated(" + this->GetPath() + ")");
                 ModuleOutCreated(this->GetPath());
             }
             //!

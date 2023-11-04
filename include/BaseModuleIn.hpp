@@ -24,10 +24,6 @@ namespace ModelController
             //!
             T actualValue = 0;
             //!
-            //! @brief Path to the connected output module
-            //!
-            std::string pathConnectedModuleOut;
-            //!
             //! @brief Listener called, if value of connected output changed
             //!
             typename Event<T>::Listener* OnOutputChanged = nullptr;
@@ -35,6 +31,11 @@ namespace ModelController
             //! @brief Listener called, if new output module was created
             //!
             Event<std::string>::Listener* OnModuleOutCreated = nullptr;
+        protected:
+            //!
+            //! @brief Path to the connected output module
+            //!
+            std::string pathConnectedModuleOut;
             //!
             //! @brief Callback called, if new output was created, to listen to output changed event
             //!
@@ -74,6 +75,7 @@ namespace ModelController
                     BaseModuleOut<T>* connectedOutput = BaseModuleOut<T>::GetModuleOutput(pathConnectedModuleOut);
                     if (connectedOutput != nullptr)
                     {
+                        Logger::trace("Connected output found");
                         //! Listen to ValueChangedEvent of connected output and delete OnModuleOutCreated, that the listener does not get called anymore
                         delete OnModuleOutCreated;
                         OnModuleOutCreated = nullptr;
@@ -86,7 +88,6 @@ namespace ModelController
                     }
                 }
             }
-        protected:
             //!
             //! @brief Set value of the input
             //!
@@ -94,7 +95,7 @@ namespace ModelController
             //! @return true Value was successfully set to input
             //! @return false Value could not be set to input
             //!
-            virtual bool SetIntputValue(T value) = 0;
+            virtual bool SetInputValue(T value) = 0;
         public:
             //!
             //! @brief Event raised, if value changed
@@ -107,12 +108,16 @@ namespace ModelController
             //! @param config Json config of the connector
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseModuleIn(std::string name, JsonObject config, BaseModule* parent = nullptr)
+            BaseModuleIn(std::string name, JsonVariant config, BaseModule* parent = nullptr)
             {
                 Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
-                if (config["connectedOut"].is<std::string>())
+                if (config.is<JsonObject>() && config["connectedOut"].is<std::string>())
                 {
                     pathConnectedModuleOut = config["connectedOut"].as<std::string>();
+                }
+                else if (config.is<std::string>())
+                {
+                    pathConnectedModuleOut = config.as<std::string>();
                 }
                 if (!pathConnectedModuleOut.empty())
                 {
@@ -161,6 +166,7 @@ namespace ModelController
                 {
                     OnOutputChanged = new typename Event<T>::Listener(event, [&](T value){ this->SetValue(value); } );
                     retVal = true;
+                    Logger::trace("OnOutputChanged set");
                 }
                 return retVal;
             }
@@ -173,7 +179,7 @@ namespace ModelController
             {
                 if (actualValue != value)
                 {
-                    if (SetIntputValue(value))
+                    if (SetInputValue(value))
                     {
                         actualValue = value;
                         ValueChangedEvent(GetValue());

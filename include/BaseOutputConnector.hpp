@@ -26,7 +26,7 @@ namespace ModelController
             //!
             //! @brief Call SetOutputValue for easier use in derived classes
             //!
-            virtual bool SetIntputValue(T value) override final
+            virtual bool SetInputValue(T value) override final
             {
                 return SetOutputValue(value);
             }
