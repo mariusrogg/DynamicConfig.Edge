@@ -1,3 +1,10 @@
+//!
+//! @file Gain.cpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Implementation of the gain
+//!
+//! @copyright Copyright (c) 2023
+//!
 #include "Gain.hpp"
 
 namespace ModelController
@@ -14,9 +21,8 @@ namespace ModelController
     //!
     Gain::Gain(std::string name, JsonObject config, BaseModule* parent)
             : BaseProcessor(name, config, parent, ModuleType::eNone, ModuleDataType::eDouble),
-            in("in", config, this),
-            out("out", config, this),
-            onInputChanged(&(in.ValueChangedEvent), [&](double value) { calculateOut(value); })
+            in("in", config, [&](double value) { calculateOut(value); }, this),
+            out("out", config, this)
         {
             if (config["gain"].is<double>())
             {

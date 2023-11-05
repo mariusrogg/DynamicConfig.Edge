@@ -8,6 +8,7 @@
 #include "BaseProcessor.hpp"
 #include "Logger.hpp"
 #include "Gain.hpp"
+#include "SequenceProcessor.hpp"
 
 namespace ModelController
 {
@@ -56,10 +57,15 @@ namespace ModelController
         if (processorConfig["type"].is<std::string>())
         {
             std::string type = processorConfig["type"].as<std::string>();
-            if (type == "gain")
+            if (type == Gain::type)
             {
                 processor = new Gain(name, processorConfig, parent);
             }
+            else if (type == SequenceProcessor::type)
+            {
+                processor = new SequenceProcessor(name, processorConfig, parent);
+            }
+
         }
         return processor;
     }

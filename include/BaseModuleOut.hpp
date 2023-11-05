@@ -10,6 +10,7 @@
 #include "EventHandling.hpp"
 #include "IBaseModuleOut.hpp"
 #include "BaseModuleIn.hpp"
+#include <type_traits>
 
 namespace ModelController
 {
@@ -23,7 +24,7 @@ namespace ModelController
             //!
             //! @brief Actual value of the output
             //!
-            T actualValue = 0;
+            T actualValue; // ToDo: initialize type dependent
             //!
             //! @brief Listener called, if new output module was created
             //!
@@ -151,8 +152,23 @@ namespace ModelController
             //!
             void SetValue(T value)
             {
+                std::string strValue;
+                std::string strActualValue;
+                if constexpr (std::is_same<T, std::string>::value)
+                {
+                    strValue = value;
+                    strActualValue = actualValue;
+                }
+                else
+                {
+                    strValue = std::to_string(value);
+                    strActualValue = std::to_string(actualValue);
+                }
+                Logger::trace("BaseModuleOut::SetValue(" + strValue + ")");
+                Logger::trace("actualValue" + strActualValue);
                 if (actualValue != value)
                 {
+                    Logger::trace("Changing value");
                     actualValue = value;
                     ValueChangedEvent(GetValue());
                 }

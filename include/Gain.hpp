@@ -34,12 +34,12 @@ namespace ModelController
         //! @param value Input value
         //!
         void calculateOut(double value);
-        //!
-        //! @brief Listener called, if input
-        //!
-        Event<double>::Listener onInputChanged;
 
     public:
+        //!
+        //! @brief Name of the type for config
+        //!
+        static constexpr const char* type = "gain";
         //!
         //! @brief Construct a new Gain object
         //!

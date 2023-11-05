@@ -7,6 +7,7 @@
 //!
 #pragma once
 #include "BaseModuleIn.hpp"
+#include "EventHandling.hpp"
 
 namespace ModelController
 {
@@ -14,6 +15,10 @@ namespace ModelController
     class ProcessorIn : public BaseModuleIn<T>
     {
         private:
+            //!
+            //! @brief Listener called, if input value changed
+            //!
+            typename Event<T>::Listener inputChanged;
             //!
             //! @brief Get the Path Connected Module Out object out of the config
             //!
@@ -24,7 +29,7 @@ namespace ModelController
             std::string GetPathConnectedModuleOut(std::string name, JsonVariant parentConfig)
             {
                 std::string path;
-                Logger::trace("ProcessorIn::GetPathConnectedModuleOut(" + name + parentConfig.as<std::string>() + ")");
+                Logger::trace("ProcessorIn::GetPathConnectedModuleOut(" + name + ", " + parentConfig.as<std::string>() + ")");
                 if (parentConfig.is<JsonObject>())
                 {
                     Logger::trace("Parent config is JsonObject");
@@ -39,7 +44,7 @@ namespace ModelController
                     Logger::trace("Parent config is string");
                     path = parentConfig.as<std::string>();
                 }
-                Logger::trace("Path of connected module out is: " + path);
+                Logger::trace("Path of connected module out is: " + path + " - size: " + std::to_string(path.size()));
                 return path;
             }
         protected:
@@ -56,10 +61,12 @@ namespace ModelController
             //!
             //! @param name Name of the actual object (ProcessorIn)
             //! @param parentConfig Json config of the parent object or json string with path to connected output module
+            //! @param inputChanged Function called, if input changed
             //! @param parent Parent of the ProcessorIn (normally pass this)
             //!
-            ProcessorIn(std::string name, JsonVariant parentConfig, BaseModule* parent = nullptr)
-                : BaseModuleIn<T>(name, GetPathConnectedModuleOut(name, parentConfig), parent)
+            ProcessorIn(std::string name, JsonVariant parentConfig, std::function<void(T)> onInputChanged, BaseModule* parent = nullptr)
+                : BaseModuleIn<T>(name, GetPathConnectedModuleOut(name, parentConfig), parent),
+                inputChanged(&(this->ValueChangedEvent), onInputChanged)
             {
                 if (this->pathConnectedModuleOut.empty())
                 {

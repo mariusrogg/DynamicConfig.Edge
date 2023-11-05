@@ -22,7 +22,7 @@ namespace ModelController
             //!
             //! @brief Actual value of the input
             //!
-            T actualValue = 0;
+            T actualValue;  // ToDo: initialize type dependent
             //!
             //! @brief Listener called, if value of connected output changed
             //!
@@ -133,8 +133,9 @@ namespace ModelController
             //! @param parent Parent of the Connector (normally pass this)
             //!
             BaseModuleIn(std::string name, std::string pathConnectedModuleOut, BaseModule* parent = nullptr)
-                : pathConnectedModuleOut(pathConnectedModuleOut)
             {
+                Logger::trace("BaseModuleIn::BaseModuleIn(" + name + ", " + pathConnectedModuleOut + ")");
+                this->pathConnectedModuleOut = pathConnectedModuleOut;
                 Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
                 if (!pathConnectedModuleOut.empty())
                 {
