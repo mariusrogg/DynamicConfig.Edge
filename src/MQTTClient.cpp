@@ -264,7 +264,7 @@ namespace ModelController
         : BaseConnector(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
-        loopListener([&](){ Serial.println("MQTT loop"); this->client.loop(); }, 0)
+        loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0)
     {
         JsonVariant jPort = config["port"];
         serverPort = DefaultPort;
