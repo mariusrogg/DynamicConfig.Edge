@@ -198,6 +198,8 @@ namespace ModelController
                                 endWithSync += activeMode->GetSyncTime();
                             }
                             timeStartMode = endWithSync;
+                            Logger::debug("Setting timeStartMode for " + GetName() + " to " + std::to_string(timeStartMode));
+                            Logger::debug("Actual time " + std::to_string(millis()));
                         }
                     }
                 }
@@ -231,6 +233,11 @@ namespace ModelController
                     // Off
                     value = 0;
                     activate.SetValue(false);
+                    timeEndMode = -1;
+                    if (nextActiveMode != nullptr)
+                    {
+                        activeMode = nullptr;
+                    }
                 }
             }
         }
