@@ -7,6 +7,8 @@
 //!
 #include <Arduino.h>
 #include <sstream>
+#include "SequenceElement.hpp"
+
 namespace ModelController
 {
     //!
