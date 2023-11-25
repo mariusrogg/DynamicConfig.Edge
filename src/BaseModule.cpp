@@ -301,6 +301,13 @@ namespace ModelController
         return path;
     }
     //!
+    //! @brief Returns short path of the actual object
+    //!
+    std::string BaseModule::GetShortPath() const
+    {
+        return shortPath;
+    }
+    //!
     //! @brief Returns name of the actual object
     //!
     std::string BaseModule::GetName() const
