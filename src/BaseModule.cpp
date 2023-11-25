@@ -252,6 +252,10 @@ namespace ModelController
         {
             this->shortPath = "/" + this->name;
         }
+        else
+        {
+            this->shortPath = (this->parent != nullptr ? this->parent->shortPath : "") + "/" + this->name;
+        }
         if (this->parent && std::find(this->parent->children.begin(), this->parent->children.end(), this) == this->parent->children.end())
         {
             this->parent->children.push_back(this);
