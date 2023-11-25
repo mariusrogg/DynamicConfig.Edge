@@ -20,7 +20,7 @@ namespace ModelController
     //! @brief Construct a new Processor object
     //!
     BaseProcessor::BaseProcessor(std::string name, JsonObject config, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
-        : BaseProcessor(name, parent, type, dataType)
+        : BaseProcessor(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, type, dataType)
     {
         Logger::trace("BaseProcessor::BaseProcessor(" + name + ", " + "json-config" + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         for (JsonPair child : config)
@@ -35,10 +35,10 @@ namespace ModelController
     //!
     //! @brief Construct a new Processor object
     //!
-    BaseProcessor::BaseProcessor(std::string name, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
+    BaseProcessor::BaseProcessor(std::string name, BaseModule* parent, bool createShortPath, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
     {
         Logger::trace("BaseProcessor::BaseProcessor(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        Initialize(name, parent, type, dataType);
+        Initialize(name, parent, createShortPath, type, dataType);
     }
     //!
     //! @brief Destruction of the Base Base Processor object

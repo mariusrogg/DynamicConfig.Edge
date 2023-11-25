@@ -20,7 +20,7 @@ namespace ModelController
     //! @brief Construct a new Connector object
     //!
     BaseConnector::BaseConnector(std::string name, JsonObject config, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
-        : BaseConnector(name, parent, type, dataType)
+        : BaseConnector(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, type, dataType)
     {
         Logger::trace("BaseConnector::BaseConnector(" + name + ", " + "json-config" + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         for (JsonPair child : config)
@@ -35,10 +35,10 @@ namespace ModelController
     //!
     //! @brief Construct a new Connector object
     //!
-    BaseConnector::BaseConnector(std::string name, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
+    BaseConnector::BaseConnector(std::string name, BaseModule* parent, bool createShortPath, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
     {
         Logger::trace("BaseConnector::BaseConnector(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        Initialize(name, parent, type, dataType);
+        Initialize(name, parent, createShortPath, type, dataType);
     }
     //!
     //! @brief Destruction of the Base Base Connector object

@@ -37,10 +37,11 @@ namespace ModelController
             //!
             //! @param name Name of the processor
             //! @param parent Parent of the Processor (normally pass this)
+            //! @param createShortPath True if short path is created from actual object
             //! @param type Type of the processor
             //! @param dataType DataType of the processor
             //!
-            BaseProcessor(std::string name, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            BaseProcessor(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
             //!
             //! @brief Destroy the Processor object
             //!

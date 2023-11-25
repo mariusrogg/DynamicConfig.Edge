@@ -231,7 +231,7 @@ namespace ModelController
     //!
     //! @brief Initialize properties and add this to parents children (if not already done)
     //!
-    void BaseModule::Initialize(std::string name, BaseModule* parent, ModuleType type, ModuleDataType dataType)
+    void BaseModule::Initialize(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
     {
         Logger::trace("BaseModule::Initialize(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         if (this->parent == nullptr)
@@ -248,6 +248,10 @@ namespace ModelController
         }
         this->name = name.substr(name.find_first_not_of("/"));
         this->path = (this->parent != nullptr ? this->parent->path : "") + "/" + this->name;
+        if (createShortPath)
+        {
+            this->shortPath = "/" + this->name;
+        }
         if (this->parent && std::find(this->parent->children.begin(), this->parent->children.end(), this) == this->parent->children.end())
         {
             this->parent->children.push_back(this);
@@ -264,12 +268,12 @@ namespace ModelController
     BaseModule::BaseModule()
     { }
     //!
-    //! @brief Construct a new Connector object
+    //! @brief Construct a new Module object
     //!
-    BaseModule::BaseModule(std::string name, BaseModule* parent, ModuleType type, ModuleDataType dataType)
+    BaseModule::BaseModule(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
     {
         Logger::trace("BaseModule::BaseModule(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        Initialize(name, parent, type, dataType);
+        Initialize(name, parent, createShortPath, type, dataType);
     }
     //!
     //! @brief Destruction the module object

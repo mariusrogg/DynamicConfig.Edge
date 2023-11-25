@@ -110,7 +110,7 @@ namespace ModelController
             //!
             BaseModuleIn(std::string name, JsonVariant config, BaseModule* parent = nullptr)
             {
-                Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
+                Initialize(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, ModuleType::eInput, GetDataTypeById(typeid(T)));
                 if (config.is<JsonObject>() && config["connectedOut"].is<std::string>())
                 {
                     pathConnectedModuleOut = config["connectedOut"].as<std::string>();
@@ -136,7 +136,7 @@ namespace ModelController
             {
                 Logger::trace("BaseModuleIn::BaseModuleIn(" + name + ", " + pathConnectedModuleOut + ")");
                 this->pathConnectedModuleOut = pathConnectedModuleOut;
-                Initialize(name, parent, ModuleType::eInput, GetDataTypeById(typeid(T)));
+                Initialize(name, parent, false, ModuleType::eInput, GetDataTypeById(typeid(T)));
                 if (!pathConnectedModuleOut.empty())
                 {
                     OnOutputCreated(pathConnectedModuleOut);

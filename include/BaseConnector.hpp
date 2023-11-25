@@ -37,10 +37,11 @@ namespace ModelController
             //!
             //! @param name Name of the connector
             //! @param parent Parent of the Connector (normally pass this)
+            //! @param createShortPath True if short path is created from actual object
             //! @param type Type of the connector
             //! @param dataType DataType of the connector
             //!
-            BaseConnector(std::string name, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            BaseConnector(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
             //!
             //! @brief Destroy the Connector object
             //!

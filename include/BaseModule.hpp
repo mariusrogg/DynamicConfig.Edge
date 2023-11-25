@@ -93,6 +93,10 @@ namespace ModelController
             //!
             std::string path;
             //!
+            //! @brief Short path of the module object
+            //!
+            std::string shortPath;
+            //!
             //! @brief Name of the module object
             //!
             std::string name;
@@ -124,10 +128,11 @@ namespace ModelController
             //!
             //! @param name Name of the module
             //! @param parent Parent of the module (normally pass this)
+            //! @param createShortPath True if short path is created from actual object
             //! @param type Type of the module
             //! @param dataType DataType of the module
             //!
-            void Initialize(std::string name, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            void Initialize(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
         public:
             //!
             //! @brief Root module of the hardware configuration
@@ -142,10 +147,11 @@ namespace ModelController
             //!
             //! @param name Name of the module
             //! @param parent Parent of the module (normally pass this)
+            //! @param createShortPath True if short path is created from actual object
             //! @param type Type of the module
             //! @param dataType DataType of the module
             //!
-            BaseModule(std::string name, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            BaseModule(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
             //!
             //! @brief Destruction of the Base Module object
             //!
@@ -166,6 +172,12 @@ namespace ModelController
             //! @return std::string Path of the object
             //!
             std::string GetPath() const;
+            //!
+            //! @brief Get the short path of the object
+            //!
+            //! @return std::string Short path of the object
+            //!
+            std::string GetShortPath() const;
             //!
             //! @brief Get the name of the object
             //!
