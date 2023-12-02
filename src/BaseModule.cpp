@@ -166,10 +166,6 @@ namespace ModelController
         return moduleDataType;
     }
     //!
-    //! @brief Path to the configuration path
-    //!
-    std::string BaseModule::configFilePath = BaseModule::defaultConfigFile;
-    //!
     //! @brief Returns child of the module
     //!
     BaseModule* BaseModule::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType)
@@ -381,21 +377,6 @@ namespace ModelController
         // }
         // file.print(connectors.c_str());
         // file.close();
-    }
-    //!
-    //! @brief Initially build config
-    //!
-    void BaseModule::InitConfig(std::string configFilePath)
-    {
-        Logger::trace("BaseModule::InitConfig(" + configFilePath + ")");
-        BaseModule::configFilePath = configFilePath;
-        File file = LittleFS.open(BaseModule::configFilePath.c_str(), FILE_READ);
-        DynamicJsonDocument jsonDoc(32768);
-
-        deserializeJson(jsonDoc, file);
-
-        file.close();
-        UpdateConfig(jsonDoc.as<JsonObject>());
     }
     //!
     //! @brief Get config of the connector and it's children
