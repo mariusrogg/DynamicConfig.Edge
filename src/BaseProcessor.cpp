@@ -65,6 +65,17 @@ namespace ModelController
             {
                 processor = new SequenceProcessor(name, processorConfig, parent);
             }
+            else
+            {
+                for (JsonPair child : processorConfig)
+                {
+                    if (child.value().is<JsonObject>())
+                    {
+                        Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                        GenerateProcessor(name + "/" + child.key().c_str(), child.value(), parent);
+                    }
+                }
+            }
 
         }
         return processor;

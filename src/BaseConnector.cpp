@@ -67,6 +67,17 @@ namespace ModelController
                 Logger::debug("Generating MQTTClient");
                 connector = new MQTTClient(name, connectorConfig, parent);
             }
+            else
+            {
+                for (JsonPair child : connectorConfig)
+                {
+                    if (child.value().is<JsonObject>())
+                    {
+                        Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                        GenerateConnector(name + "/" + child.key().c_str(), child.value(), parent);
+                    }
+                }
+            }
         }
         return connector;
     }
