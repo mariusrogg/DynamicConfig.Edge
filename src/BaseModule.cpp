@@ -8,7 +8,7 @@
 #include "BaseModule.hpp"
 #include "WiFiHandler.hpp"
 #include "BaseConnector.hpp"
-#include "BaseProcessor.hpp"
+#include "RootProcessor.hpp"
 #include <sstream>
 #include "LittleFS.h"
 #include "Logger.hpp"
@@ -355,16 +355,16 @@ namespace ModelController
             BaseConnector::rootConnector = new BaseConnector(connectorsName, cnf[connectorsName.c_str()].as<JsonObject>(), rootModule);
         }
 
-        if (BaseProcessor::rootProcessor != nullptr)
+        if (RootProcessor::rootProcessor != nullptr)
         {
-            delete BaseProcessor::rootProcessor;
-            BaseProcessor::rootProcessor = nullptr;
+            delete RootProcessor::rootProcessor;
+            RootProcessor::rootProcessor = nullptr;
             Logger::trace("Deleted old rootProcessor");
         }
         std::string processorsName = "Processors";
         if (cnf[processorsName.c_str()].is<JsonObject>())
         {
-            BaseProcessor::rootProcessor = new BaseProcessor(processorsName, cnf[processorsName.c_str()].as<JsonObject>(), rootModule);
+            RootProcessor::rootProcessor = new RootProcessor(processorsName, cnf[processorsName.c_str()].as<JsonObject>(), rootModule);
         }
 
         // std::string connectors = "{ \"" + rootConnector->GetName() + "\": {" + rootConnector->GetConfig() + "}}";

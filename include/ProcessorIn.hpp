@@ -70,8 +70,8 @@ namespace ModelController
             {
                 if (this->pathConnectedModuleOut.empty())
                 {
-                    this->pathConnectedModuleOut = "/root/Connectors/mqtt" + this->GetPath();
-                    Logger::trace("Creating connection to default connector for " + this->GetPath());
+                    this->pathConnectedModuleOut = "/root/Connectors/mqtt" + this->GetShortPath();
+                    Logger::trace("Creating connection to default connector for " + this->GetShortPath());
                     this->OnOutputCreated(this->pathConnectedModuleOut);
                 }
             }

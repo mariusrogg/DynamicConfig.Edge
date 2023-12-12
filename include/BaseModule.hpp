@@ -10,6 +10,7 @@
 #include <ArduinoJson.h>
 #include <string>
 #include <vector>
+#include "Logger.hpp"
 
 namespace ModelController
 {
@@ -100,10 +101,6 @@ namespace ModelController
             //! @brief Name of the module object
             //!
             std::string name;
-            //!
-            //! @brief Default config file path
-            //!
-            static std::string configFilePath;
 
         protected:
             //!
@@ -133,7 +130,67 @@ namespace ModelController
             //! @param dataType DataType of the module
             //!
             void Initialize(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            virtual void Delete()
+            {
+                for (BaseModule* child : children)
+                {
+                    child->Delete();
+                }
+            }
+            virtual void Update(JsonVariant config)
+            {
+                Logger::trace("BaseModule::Update(" + config.as<std::string>() + ")", true);
+                Logger::trace("Module Path: " + GetPath(), true);
+                for (BaseModule* child : children)
+                {
+                    if (child->GetName().empty())
+                    {
+                        child->Update(config);
+                    }
+                    else if (config.containsKey(child->GetName()))   // ToDo: Handle names with '/'
+                    {
+                        child->Update(config[child->GetName()]);
+                    }
+                    else
+                    {
+                        child->Delete();
+                    }
+                }
+                if (config.is<JsonObject>())
+                {
+                    for (JsonPair childConfig : config.as<JsonObject>())
+                    {
+                        // ToDo: Handle names with '/'
+                        if (std::find_if(children.begin(), children.end(), [&childConfig](const BaseModule* child){return child->GetName() == childConfig.key().c_str();}) == children.end())
+                        {
+                            Create(childConfig.key().c_str(), childConfig.value());
+                        }
+                    }
+                }
+
+            }
+            virtual void Create(std::string name, JsonObject childConfig)
+            {
+            }
         public:
+            static void Delete(std::string path)
+            {
+                BaseModule* module = GetModule<BaseModule>(path);
+                if (module != nullptr)
+                {
+                    module->Delete();
+                }
+            }
+            static void Update(std::string path, JsonVariant config)
+            {
+                // ToDo: RootProcessor/RootConnector cannot be updated
+                Logger::trace("static BaseModule::Update(" + path + ", " + config.as<std::string>() + ")", true);
+                BaseModule* module = GetModule<BaseModule>(path);
+                if (module != nullptr)
+                {
+                    module->Update(config);
+                }
+            }
             //!
             //! @brief Root module of the hardware configuration
             //!
@@ -156,10 +213,6 @@ namespace ModelController
             //! @brief Destruction of the Base Module object
             //!
             virtual ~BaseModule();
-            //!
-            //! @brief Default config file path
-            //!
-            static constexpr const char* defaultConfigFile = "/Config.json";
             //!
             //! @brief Get the Parent of the object
             //!
@@ -218,10 +271,6 @@ namespace ModelController
             //! @param config Json object with new hardware config
             //!
             static void UpdateConfig(JsonObject config);
-            //!
-            //! @brief Initialize hardware configuration
-            //!
-            static void InitConfig(std::string configFilePath = defaultConfigFile);
             //!
             //! @brief Get the config of the connector
             //!

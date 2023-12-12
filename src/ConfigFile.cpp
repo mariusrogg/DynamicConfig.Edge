@@ -22,14 +22,6 @@ namespace ModelController
     //!
     Event<> ConfigFile::ConfigReloaded;
     //!
-    //! @brief Event raised, if config was changed
-    //!
-    Event<std::string> ConfigFile::ConfigChanged;
-    //!
-    //! @brief Event raised, if config was deleted
-    //!
-    Event<std::string> ConfigFile::ConfigDeleted;
-    //!
     //! @brief Open config file and write content to configDoc
     //!
     void ConfigFile::Load(std::string configFilePath)
@@ -167,11 +159,6 @@ namespace ModelController
                 if (path.find_first_not_of('/') != std::string::npos && (objParentConfig.isNull() || (objParentConfig.size() == 0)))
                 {
                     Remove(path, false);
-                }
-                //! @brief If parent does not need to be deleted (has more children), event is raised, informing, that part of the config was deleted
-                else
-                {
-                    ConfigDeleted(path + "/" + name);
                 }
                 //! @brief Save after removing
                 if (save)

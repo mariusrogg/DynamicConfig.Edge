@@ -21,10 +21,10 @@ namespace ModelController
             //! @param parentConfig Json config of the parent object or json string with path to connected input module
             //! @return std::string Extracted path of the connected input module, empty string if not found in parentConfig
             //!
-            std::string GetPathConnectedModuleIn(std::string name, JsonVariant parentConfig)
+            static std::string GetPathConnectedModuleIn(std::string name, JsonVariant parentConfig)
             {
                 std::string path;
-                Logger::trace("ProcessorOut::GetPathConnectedModuleIn(" + name + parentConfig.as<std::string>() + ")");
+                Logger::trace("ProcessorOut::GetPathConnectedModuleIn(" + name + "," + parentConfig.as<std::string>() + ")");
                 if (parentConfig.is<JsonObject>())
                 {
                     Logger::trace("Parent config is JsonObject");
@@ -55,8 +55,8 @@ namespace ModelController
             {
                 if (this->pathConnectedModuleIn.empty())
                 {
-                    this->pathConnectedModuleIn = "/root/Connectors/mqtt" + this->GetPath();
-                    Logger::trace("Creating connection to default connector for " + this->GetPath());
+                    this->pathConnectedModuleIn = "/root/Connectors/mqtt" + this->GetShortPath();
+                    Logger::trace("Creating connection to default connector for " + this->GetShortPath());
                     this->OnInputCreated(this->pathConnectedModuleIn);
                 }
             }

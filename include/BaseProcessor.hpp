@@ -12,16 +12,37 @@
 #include <string>
 #include "BaseModule.hpp"
 #include "Logger.hpp"
+#include "ConfigFile.hpp"
+#include "IBaseProcessor.hpp"
 
 namespace ModelController
 {
-    class BaseProcessor : public virtual BaseModule
+    // class RootProcessor;
+    template<typename Derived>
+    class BaseProcessor : public IBaseProcessor
     {
+        protected:
+            virtual void Delete() override
+            {
+                ConfigFile::Remove(GetPath());
+                delete this;
+            }
+            virtual void Update(JsonVariant config) override
+            {
+                if (!config["type"].is<std::string>() || config["type"].as<std::string>() != Derived::GetProcessorType())
+                {
+                    Delete();
+                }
+                else
+                {
+                    BaseModule::Update(config);
+                }
+            }
+            virtual void Create(std::string name, JsonObject childConfig) override
+            {
+                GenerateProcessor(name, childConfig, this);
+            }
         public:
-            //!
-            //! @brief Root processor of the hardware configuration
-            //!
-            static BaseProcessor* rootProcessor;
             //!
             //! @brief Construct a new Processor object
             //!
@@ -50,9 +71,9 @@ namespace ModelController
             //! @brief Generate processor from json
             //!
             //! @param processorConfig Config of the processor
-            //! @return BaseProcessor* Created processor
+            //! @return IBaseProcessor* Created processor
             //!
-            static BaseProcessor* GenerateProcessor(std::string name, JsonObject processorConfig, BaseProcessor* parent = nullptr);
+            static IBaseProcessor* GenerateProcessor(std::string name, JsonObject processorConfig, IBaseProcessor* parent = nullptr);
             //!
             //! @brief Get a processor by path
             //!
@@ -81,7 +102,8 @@ namespace ModelController
             static T* GetProcessor(std::string processorPath, BaseModule::ModuleType type = ModuleType::eUndefined, BaseModule::ModuleDataType dataType = ModuleDataType::eUndefined)
             {
                 Logger::trace("BaseProcessor::GetProcessor(" + processorPath + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-                return rootProcessor == nullptr ? nullptr : rootProcessor->GetChildProcessor<T>(processorPath, type, dataType);
+                // ToDo: return RootProcessor::rootProcessor == nullptr ? nullptr : RootProcessor::rootProcessor->GetChildProcessor<T>(processorPath, type, dataType);
+                return nullptr;
             }
     };
 } // namespace ModelController

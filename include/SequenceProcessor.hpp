@@ -16,7 +16,7 @@
 
 namespace ModelController
 {
-    class SequenceProcessor : public BaseProcessor
+    class SequenceProcessor : public BaseProcessor<SequenceProcessor>
     {
         private:
             //!
@@ -126,6 +126,10 @@ namespace ModelController
             void Execute();
 
         public:
+            static std::string GetProcessorType()
+            {
+                return "sequence";
+            }
             //!
             //! @brief Name of the type for config
             //!

@@ -17,6 +17,11 @@ namespace ModelController
 {
     class BaseConnector : public virtual BaseModule
     {
+        protected:
+            virtual void Delete() override
+            {
+                delete this;
+            }
         public:
             //!
             //! @brief Root connector of the hardware configuration

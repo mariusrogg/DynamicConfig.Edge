@@ -14,7 +14,7 @@ namespace ModelController
     //!
     void Gain::calculateOut(double value)
     {
-        out.SetValue(value * gainValue);
+        out.SetValue(value * gain.GetValue());
     }
     //!
     //! @brief Construct a new Gain object
@@ -22,11 +22,8 @@ namespace ModelController
     Gain::Gain(std::string name, JsonObject config, BaseModule* parent)
             : BaseProcessor(name, config, parent, ModuleType::eNone, ModuleDataType::eDouble),
             in("in", config, [&](double value) { calculateOut(value); }, this),
-            out("out", config, this)
+            out("out", config, this),
+            gain("gain", config, 1, this)
         {
-            if (config["gain"].is<double>())
-            {
-                gainValue = config["gain"].as<double>();
-            }
         }
 } // namespace ModelController

@@ -41,14 +41,6 @@ namespace ModelController
             //!
             static Event<> ConfigReloaded;
             //!
-            //! @brief Event raised if config was changed (path is passed to event)
-            //!
-            static Event<std::string> ConfigChanged;
-            //!
-            //! @brief Event raised if config was deleted (path is passed to event)
-            //!
-            static Event<std::string> ConfigDeleted;
-            //!
             //! @brief (Re-)load the config from a file
             //!
             //! @param configFilePath Path to the config file
@@ -75,7 +67,6 @@ namespace ModelController
                 GetConfig(path, true).set(value);
                 configDoc.garbageCollect();
                 Save();
-                ConfigChanged(path);
             }
             //!
             //! @brief Remove elements from json

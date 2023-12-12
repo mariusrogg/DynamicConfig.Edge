@@ -10,10 +10,11 @@
 #include "ProcessorOut.hpp"
 #include "ProcessorIn.hpp"
 #include "BaseProcessor.hpp"
+#include "ConfigItem.hpp"
 
 namespace ModelController
 {
-    class Gain : public BaseProcessor
+    class Gain : public BaseProcessor<Gain>
     {
     private:
         //!
@@ -27,7 +28,7 @@ namespace ModelController
         //!
         //! @brief Multiplicator
         //!
-        double gainValue = 1;
+        ConfigItem<double> gain;
         //!
         //! @brief Calculate output depending on input0
         //!
@@ -36,10 +37,14 @@ namespace ModelController
         void calculateOut(double value);
 
     public:
+        static std::string GetProcessorType()
+        {
+            return "gain";
+        }
         //!
         //! @brief Name of the type for config
         //!
-        static constexpr const char* type = "gain";
+        static constexpr const char* type = "gain"; // ToDo: Remove type in all Processors/Connectors, when implementing GetProcessorType
         //!
         //! @brief Construct a new Gain object
         //!
