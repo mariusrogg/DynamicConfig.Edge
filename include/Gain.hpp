@@ -7,23 +7,23 @@
 //!
 //!
 #pragma once
-#include "ProcessorOut.hpp"
-#include "ProcessorIn.hpp"
-#include "BaseProcessor.hpp"
+#include "ModuleOut.hpp"
+#include "ModuleIn.hpp"
+#include "BaseModule.hpp"
 
 namespace ModelController
 {
-    class Gain : public BaseProcessor
+    class Gain : public BaseModule
     {
     private:
         //!
         //! @brief Input value
         //!
-        ProcessorIn<double> in;
+        ModuleIn<double> in;
         //!
         //! @brief Output value
         //!
-        ProcessorOut<double> out;
+        ModuleOut<double> out;
         //!
         //! @brief Multiplicator
         //!

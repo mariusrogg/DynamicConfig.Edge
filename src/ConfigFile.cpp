@@ -53,8 +53,6 @@ namespace ModelController
         Logger::trace("ConfigFile::GetConfig(" + path + ")");
         JsonVariant result;
         path = Utils::Trim(path, "/");
-        path = Utils::TrimStart(path, "root");
-        path = Utils::TrimStart(path, "/");
 
         JsonVariant jVariant = configDoc.as<JsonVariant>();
         JsonVariant oldJVariant;

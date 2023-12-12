@@ -7,14 +7,21 @@
 //!
 #include "BaseModule.hpp"
 #include "WiFiHandler.hpp"
-#include "BaseConnector.hpp"
-#include "BaseProcessor.hpp"
 #include <sstream>
 #include "LittleFS.h"
 #include "Logger.hpp"
 
+#include "Gain.hpp"
+#include "SequenceProcessor.hpp"
+#include "OnboardPWM.hpp"
+#include "MQTTClient.hpp"
+
 namespace ModelController
 {
+    //!
+    //! @brief Root module
+    //!
+    BaseModule* BaseModule::rootModule = nullptr;
     //!
     //! @brief Switch through possible types and return type as string
     //!
@@ -166,6 +173,20 @@ namespace ModelController
         return moduleDataType;
     }
     //!
+    //! @brief Set config to object and generate submodules
+    //!
+    void BaseModule::SetConfig(JsonObject config)
+    {
+        for (JsonPair child : config)
+        {
+            if (child.value().is<JsonObject>())
+            {
+                Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                GenerateModule(child.key().c_str(), child.value(), this);
+            }
+        }
+    }
+    //!
     //! @brief Returns child of the module
     //!
     BaseModule* BaseModule::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType)
@@ -173,7 +194,7 @@ namespace ModelController
         Logger::trace("BaseModule::GetChild(" + modulePath + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         Logger::trace("this->path: " + GetPath());
         //! @brief Trim '/' at start of path
-        modulePath = modulePath.substr(modulePath.find_first_not_of('/'));
+        Utils::TrimStart(modulePath, "/");
         Logger::trace("Module path without trailing slashs: " + modulePath);
         BaseModule* module = nullptr;
         //! @brief Iterate through children
@@ -225,25 +246,16 @@ namespace ModelController
         return module;
     }
     //!
-    //! @brief Initialize properties and add this to parents children (if not already done)
+    //! @brief Construct a new Module object
     //!
-    void BaseModule::Initialize(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
+    BaseModule::BaseModule(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
+        : parent(parent),
+        moduleType(type),
+        moduleDataType(dataType)
     {
-        Logger::trace("BaseModule::Initialize(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        if (this->parent == nullptr)
-        {
-            this->parent = parent;
-        }
-        if (this->moduleType == ModuleType::eUndefined)
-        {
-            this->moduleType = type;
-        }
-        if (this->moduleDataType == ModuleDataType::eUndefined)
-        {
-            this->moduleDataType = dataType;
-        }
-        this->name = name.substr(name.find_first_not_of("/"));
-        this->path = (this->parent != nullptr ? this->parent->path : "") + "/" + this->name;
+        this->name = Utils::Trim(name, "/");
+        this->path = (this->parent != nullptr ? Utils::TrimEnd(this->parent->path, "/") : "") + "/" + this->name;
+        Logger::trace("BaseModule::BaseModule(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         if (createShortPath)
         {
             this->shortPath = "/" + this->name;
@@ -252,28 +264,20 @@ namespace ModelController
         {
             this->shortPath = (this->parent != nullptr ? this->parent->shortPath : "") + "/" + this->name;
         }
-        if (this->parent && std::find(this->parent->children.begin(), this->parent->children.end(), this) == this->parent->children.end())
+        if (this->parent)
         {
             this->parent->children.push_back(this);
             Logger::debug("Added " + GetPath() + " to children of " + parent->GetPath());
         }
     }
     //!
-    //! @brief Root module
-    //!
-    BaseModule* BaseModule::rootModule = nullptr;
-    //!
-    //! @brief Default ctor
-    //!
-    BaseModule::BaseModule()
-    { }
-    //!
     //! @brief Construct a new Module object
     //!
-    BaseModule::BaseModule(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
+    BaseModule::BaseModule(std::string name, JsonObject config, BaseModule* parent, ModuleType type, ModuleDataType dataType)
+        : BaseModule(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, type, dataType)
     {
-        Logger::trace("BaseModule::BaseModule(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        Initialize(name, parent, createShortPath, type, dataType);
+        Logger::trace("BaseModule::BaseModule(" + name + ", json-config, " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
+        SetConfig(config);
     }
     //!
     //! @brief Destruction the module object
@@ -285,6 +289,46 @@ namespace ModelController
         {
             remove(parent->children.begin(), parent->children.end(), this);
         }
+    }
+    //!
+    //! @brief Generates module from json
+    //!
+    BaseModule* BaseModule::GenerateModule(std::string name, JsonObject moduleConfig, BaseModule* parent)
+    {
+        Logger::trace("BaseModule::GenerateModule(" + name + ", " + "json-config" + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
+        BaseModule* module = nullptr;
+        if (moduleConfig["type"].is<std::string>())
+        {
+            std::string type = moduleConfig["type"].as<std::string>();
+            if (type == Gain::type)
+            {
+                module = new Gain(name, moduleConfig, parent);
+            }
+            else if (type == SequenceProcessor::type)
+            {
+                module = new SequenceProcessor(name, moduleConfig, parent);
+            }
+            else if (type == OnboardPWM::type)
+            {
+                module = new OnboardPWM(name, moduleConfig, parent);
+            }
+            else if (type == MQTTClient::type)
+            {
+                module = new MQTTClient(name, moduleConfig, parent);
+            }
+        }
+        if (module == nullptr)
+        {
+            for (JsonPair child : moduleConfig)
+            {
+                if (child.value().is<JsonObject>())
+                {
+                    Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                    GenerateModule(name + "/" + child.key().c_str(), child.value(), parent);
+                }
+            }
+        }
+        return module;
     }
     //!
     //! @brief Returns parent of the actual object
@@ -320,63 +364,28 @@ namespace ModelController
     void BaseModule::UpdateConfig(JsonObject config)
     {
         Logger::info("Updating config");
+
+        if (config["wifi"]["ssid"].isNull())
+        {
+            config["wifi"]["ssid"] = WiFiHandler::GetSSID();
+        }
+        if (config["wifi"]["password"].isNull())
+        {
+            config["wifi"]["password"] = WiFiHandler::GetPassword();
+        }
+
+        WiFiHandler::SetSSIDPassword(config["wifi"]["ssid"], config["wifi"]["password"]);
+
+
         if (rootModule != nullptr)
         {
             delete rootModule;
             rootModule = nullptr;
             Logger::trace("Deleted old rootModule");
         }
-        rootModule = new BaseModule("root");
+        rootModule = new BaseModule("");
+        rootModule->SetConfig(config);
 
-        JsonObject cnf(config);
-
-
-        if (cnf["wifi"]["ssid"].isNull())
-        {
-            cnf["wifi"]["ssid"] = WiFiHandler::GetSSID();
-        }
-        if (cnf["wifi"]["password"].isNull())
-        {
-            cnf["wifi"]["password"] = WiFiHandler::GetPassword();
-        }
-
-        WiFiHandler::SetSSIDPassword(cnf["wifi"]["ssid"], cnf["wifi"]["password"]);
-
-
-        if (BaseConnector::rootConnector != nullptr)
-        {
-            delete BaseConnector::rootConnector;
-            BaseConnector::rootConnector = nullptr;
-            Logger::trace("Deleted old rootConnector");
-        }
-        std::string connectorsName = "Connectors";
-        if (cnf[connectorsName.c_str()].is<JsonObject>())
-        {
-            BaseConnector::rootConnector = new BaseConnector(connectorsName, cnf[connectorsName.c_str()].as<JsonObject>(), rootModule);
-        }
-
-        if (BaseProcessor::rootProcessor != nullptr)
-        {
-            delete BaseProcessor::rootProcessor;
-            BaseProcessor::rootProcessor = nullptr;
-            Logger::trace("Deleted old rootProcessor");
-        }
-        std::string processorsName = "Processors";
-        if (cnf[processorsName.c_str()].is<JsonObject>())
-        {
-            BaseProcessor::rootProcessor = new BaseProcessor(processorsName, cnf[processorsName.c_str()].as<JsonObject>(), rootModule);
-        }
-
-        // std::string connectors = "{ \"" + rootConnector->GetName() + "\": {" + rootConnector->GetConfig() + "}}";
-
-        // ToDo: Override file on change
-        // File file = LittleFS.open(BaseConnector::configFilePath.c_str(), FILE_WRITE);
-        // if (!file)
-        // {
-        //     return;
-        // }
-        // file.print(connectors.c_str());
-        // file.close();
     }
     //!
     //! @brief Get config of the connector and it's children

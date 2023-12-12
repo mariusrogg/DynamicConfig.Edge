@@ -8,17 +8,15 @@
 #pragma once
 
 #include "PubSubClient.h"
-#include "BaseConnector.hpp"
+#include "BaseModule.hpp"
 #include "WiFi.h"
 #include <map>
-#include "MQTTInput.hpp"
-#include "IMQTTInput.hpp"
-#include "MQTTOutput.hpp"
+#include "IModuleOut.hpp"
 #include "LoopEvent.hpp"
 
 namespace ModelController
 {
-    class MQTTClient : public BaseConnector
+    class MQTTClient : public BaseModule
     {
         private:
             //!
@@ -26,9 +24,9 @@ namespace ModelController
             //!
             LoopEvent::LoopListener loopListener;
             //!
-            //! @brief List of input variables
+            //! @brief List of input variables (output of the mqtt client)
             //!
-            std::map<std::string, IMQTTInput*> inputVariables;
+            std::map<std::string, IModuleOut*> mqttInputVariables;
             //!
             //! @brief Default hostname of the MQTT broker
             //!
@@ -103,7 +101,7 @@ namespace ModelController
             //! @param config Config of the connection
             //! @param parent Parent of the MQTTClient-Connection (normally pass this)
             //!
-            MQTTClient(std::string name, JsonObject config, BaseConnector* parent = nullptr);
+            MQTTClient(std::string name, JsonObject config, BaseModule* parent = nullptr);
             //!
             //! @brief Publish topic to mqtt broker
             //!

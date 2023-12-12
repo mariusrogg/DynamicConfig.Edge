@@ -6,8 +6,10 @@
 //! @copyright Copyright (c) 2023
 //!
 #include "MQTTClient.hpp"
+#include "ModuleIn.hpp"
 #include "WiFiHandler.hpp"
 #include "Logger.hpp"
+#include "Utils.hpp"
 
 namespace ModelController
 {
@@ -19,9 +21,9 @@ namespace ModelController
         Logger::debug("MQTT callback called");
         std::string topicName(topic);
         Logger::debug("Topic: " + topicName);
-        if (inputVariables.count(topic))
+        if (mqttInputVariables.count(topic))
         {
-            IMQTTInput* inputVar = inputVariables[topic];
+            IModuleOut* outputVar = mqttInputVariables[topic];
 
             std::string messageTemp;
             for (int i = 0; i < length; i++)
@@ -30,7 +32,7 @@ namespace ModelController
             }
             Logger::debug("Message: " + messageTemp);
 
-            inputVar->SetMQTTValue(messageTemp);
+            outputVar->SetStringValue(messageTemp);
         }
 
     }
@@ -50,7 +52,7 @@ namespace ModelController
         if (client.connect(clientID.c_str()))
         {
             Logger::info("MQTT connected");
-            for (std::pair<std::string, IMQTTInput*> kvp : inputVariables)
+            for (std::pair<std::string, IModuleOut*> kvp : mqttInputVariables)
             {
                 subscribe(("/" + kvp.second->GetName()).c_str());
             }
@@ -77,8 +79,10 @@ namespace ModelController
             if (type == ModuleType::eInput)
             {
                 Logger::trace("Creating new MQTT output variable with type " + DataTypeToString(dataType));
-                IMQTTOutput* outputVar = nullptr;
-                std::function<bool(std::string, std::string)> pubFn = [&](std::string topic, std::string value) -> bool{ return this->publish(topic, value);};
+                IModuleIn* outputVar = nullptr;
+                modulePath = Utils::TrimStart(modulePath, "/");
+                std::string topic = "/" + modulePath;
+                std::function<void(std::string)> pubFn = [&, topic](std::string value) { this->publish(topic, value);};
                 switch (dataType)
                 {
                     case ModuleDataType::eUndefined:
@@ -87,62 +91,62 @@ namespace ModelController
                         break;
                     case ModuleDataType::eDouble:
                         {
-                            child = new MQTTOutput<double>(modulePath, pubFn, this);
+                            child = new ModuleIn<double>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eFloat:
                         {
-                            child = new MQTTOutput<float>(modulePath, pubFn, this);
+                            child = new ModuleIn<float>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eString:
                         {
-                            child = new MQTTOutput<std::string>(modulePath, pubFn, this);
+                            child = new ModuleIn<std::string>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt8:
                         {
-                            child = new MQTTOutput<int8_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<int8_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt16:
                         {
-                            child = new MQTTOutput<int16_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<int16_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt32:
                         {
-                            child = new MQTTOutput<int32_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<int32_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt64:
                         {
-                            child = new MQTTOutput<int64_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<int64_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt8:
                         {
-                            child = new MQTTOutput<uint8_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<uint8_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt16:
                         {
-                            child = new MQTTOutput<uint16_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<uint16_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt32:
                         {
-                            child = new MQTTOutput<uint32_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<uint32_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt64:
                         {
-                            child = new MQTTOutput<uint64_t>(modulePath, pubFn, this);
+                            child = new ModuleIn<uint64_t>(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eBool:
                         {
-                            child = new MQTTOutput<bool>(modulePath, pubFn, this);
+                            child = new ModuleIn<bool>(modulePath, pubFn, this);
                         }
                         break;
                     default:
@@ -152,7 +156,7 @@ namespace ModelController
             else if (type == ModuleType::eOutput)
             {
                 Logger::trace("Creating new MQTT input variable with type " + DataTypeToString(dataType));
-                IMQTTInput* inputVar = nullptr;
+                IModuleOut* mqttInput = nullptr;
                 switch (dataType)
                 {
                     case ModuleDataType::eUndefined:
@@ -161,97 +165,97 @@ namespace ModelController
                         break;
                     case ModuleDataType::eDouble:
                         {
-                            MQTTInput<double>* input = new MQTTInput<double>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<double>* input = new ModuleOut<double>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eFloat:
                         {
-                            MQTTInput<float>* input = new MQTTInput<float>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<float>* input = new ModuleOut<float>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eString:
                         {
-                            MQTTInput<std::string>* input = new MQTTInput<std::string>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<std::string>* input = new ModuleOut<std::string>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eInt8:
                         {
-                            MQTTInput<int8_t>* input = new MQTTInput<int8_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<int8_t>* input = new ModuleOut<int8_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eInt16:
                         {
-                            MQTTInput<int16_t>* input = new MQTTInput<int16_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<int16_t>* input = new ModuleOut<int16_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eInt32:
                         {
-                            MQTTInput<int32_t>* input = new MQTTInput<int32_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<int32_t>* input = new ModuleOut<int32_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eInt64:
                         {
-                            MQTTInput<int64_t>* input = new MQTTInput<int64_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<int64_t>* input = new ModuleOut<int64_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eUInt8:
                         {
-                            MQTTInput<uint8_t>* input = new MQTTInput<uint8_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<uint8_t>* input = new ModuleOut<uint8_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eUInt16:
                         {
-                            MQTTInput<uint16_t>* input = new MQTTInput<uint16_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<uint16_t>* input = new ModuleOut<uint16_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eUInt32:
                         {
-                            MQTTInput<uint32_t>* input = new MQTTInput<uint32_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<uint32_t>* input = new ModuleOut<uint32_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eUInt64:
                         {
-                            MQTTInput<uint64_t>* input = new MQTTInput<uint64_t>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<uint64_t>* input = new ModuleOut<uint64_t>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     case ModuleDataType::eBool:
                         {
-                            MQTTInput<bool>* input = new MQTTInput<bool>(modulePath, this);
-                            inputVar = input;
+                            ModuleOut<bool>* input = new ModuleOut<bool>(modulePath, this);
+                            mqttInput = input;
                             child = input;
                         }
                         break;
                     default:
                         break;
                 }
-                if (inputVar != nullptr)
+                if (mqttInput != nullptr)
                 {
                     // ToDo: Delete from input variables, if destructor called (idea: via events)
-                    Logger::debug("Add MQTT input variable /" + inputVar->GetName() + " to inputVariables and subscribe");
-                    inputVariables["/" + inputVar->GetName()] = inputVar;
-                    subscribe("/" + inputVar->GetName());
+                    Logger::debug("Add MQTT input variable /" + mqttInput->GetName() + " to inputVariables and subscribe");
+                    mqttInputVariables["/" + mqttInput->GetName()] = mqttInput;
+                    subscribe("/" + mqttInput->GetName());
                 }
             }
         }
@@ -260,8 +264,8 @@ namespace ModelController
     //!
     //! @brief Construct a new MQTTClient::MQTTClient object
     //!
-    MQTTClient::MQTTClient(std::string name, JsonObject config, BaseConnector* parent)
-        : BaseConnector(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
+    MQTTClient::MQTTClient(std::string name, JsonObject config, BaseModule* parent)
+        : BaseModule(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
         loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0)
@@ -286,14 +290,15 @@ namespace ModelController
         client.setServer(serverHostname.c_str(), serverPort);
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
 
-        IBaseModuleOut::ModuleOutCreated(this->GetPath() + "/*");
-        IBaseModuleIn::ModuleInCreated(this->GetPath() + "/*");
+        IModuleOut::ModuleOutCreated(this->GetPath() + "/*");
+        IModuleIn::ModuleInCreated(this->GetPath() + "/*");
     }
     //!
     //! @brief Calls publish from PubSubClient
     //!
     bool MQTTClient::publish(std::string topic, std::string value)
     {
+        Logger::trace("MQTT " + GetPath() + " publish " + value + " to " + topic);
         return client.publish(topic.c_str(), value.c_str());
     }
 } // namespace ModelController

@@ -91,7 +91,7 @@ namespace ModelController
     //! @brief Initializing modes, sequences, ... by json
     //!
     SequenceProcessor::SequenceProcessor(std::string name, JsonObject config, BaseModule* parent)
-        : BaseProcessor(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
+        : BaseModule(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         loopListener([&](){this->Execute();}),
         out("out", config, this),
         on(config["on"].is<std::string>() ? config["on"].as<std::string>() : "{}"),

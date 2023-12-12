@@ -1,13 +1,9 @@
 #include "LittleFS.h"
-#include "OnboardPWM.hpp"
-#include "BaseConnector.hpp"
 #include "WiFiHandler.hpp"
-#include "EventHandling.hpp"
-#include "MQTTOutput.hpp"
-#include "MQTTInput.hpp"
-#include "MQTTClient.hpp"
+#include "BaseModule.hpp"
 #include "LoopEvent.hpp"
 #include "Logger.hpp"
+#include "ConfigFile.hpp"
 
 void setup()
 {
@@ -20,11 +16,13 @@ void setup()
         Logger::fatal("LittleFS failed");
         return;
     }
-    File connectors = LittleFS.open(ModelController::BaseConnector::defaultConfigFile);
+    File connectors = LittleFS.open(ModelController::BaseModule::defaultConfigFile);
     Serial.println(connectors.readString().c_str());
     connectors.close();
 
-    ModelController::BaseModule::InitConfig();
+    ModelController::ConfigFile::Load();
+
+    ModelController::BaseModule::UpdateConfig(ModelController::ConfigFile::GetConfig("").as<JsonObject>());
 }
 
 int i = 0;

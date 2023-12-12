@@ -6,9 +6,9 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseProcessor.hpp"
-#include "ProcessorIn.hpp"
-#include "ProcessorOut.hpp"
+#include "BaseModule.hpp"
+#include "ModuleIn.hpp"
+#include "ModuleOut.hpp"
 #include "Sequence.hpp"
 #include <map>
 #include "SequenceMode.hpp"
@@ -16,7 +16,7 @@
 
 namespace ModelController
 {
-    class SequenceProcessor : public BaseProcessor
+    class SequenceProcessor : public BaseModule
     {
         private:
             //!
@@ -26,11 +26,11 @@ namespace ModelController
             //!
             //! @brief Output value of the Sequence processor
             //!
-            ProcessorOut<double> out;
+            ModuleOut<double> out;
             //!
             //! @brief Input value for setting active
             //!
-            ProcessorIn<bool> activate;
+            ModuleIn<bool> activate;
             //!
             //! @brief Method called, if activate value changed
             //!
@@ -40,7 +40,7 @@ namespace ModelController
             //!
             //! @brief Input value for setting output manually
             //!
-            ProcessorIn<double> manualTarget;
+            ModuleIn<double> manualTarget;
             //!
             //! @brief Method called, if manualTarget value changed
             //!
@@ -50,7 +50,7 @@ namespace ModelController
             //!
             //! @brief Input value for setting target mode
             //!
-            ProcessorIn<std::string> targetMode;
+            ModuleIn<std::string> targetMode;
             //!
             //! @brief Method called, if targetMode value changed
             //!

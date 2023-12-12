@@ -14,7 +14,7 @@ namespace ModelController
     //!
     std::string Utils::TrimStart(std::string origin, std::string trim)
     {
-        while (origin.find(trim.c_str()) == 0)
+        while (StartsWith(origin, trim))
         {
             origin.erase(0, trim.size());
         }
@@ -25,12 +25,9 @@ namespace ModelController
     //!
     std::string Utils::TrimEnd(std::string origin, std::string trim)
     {
-        if (origin.size() >= trim.size())
+        while (EndsWith(origin, trim))
         {
-            while (origin.find(trim.c_str(), origin.size() - trim.size()) == origin.size() - trim.size())
-            {
-                origin.erase(origin.size() - trim.size(), trim.size());
-            }
+            origin.erase(origin.size() - trim.size(), trim.size());
         }
         return origin;
     }
@@ -42,6 +39,20 @@ namespace ModelController
         origin = TrimStart(origin, trim);
         origin = TrimEnd(origin, trim);
         return origin;
+    }
+    //!
+    //! @brief Check if value starts with check
+    //!
+    bool Utils::StartsWith(std::string value, std::string check)
+    {
+        return value.find(check.c_str()) == 0;
+    }
+    //!
+    //! @brief Check if value ends with check
+    //!
+    bool Utils::EndsWith(std::string value, std::string check)
+    {
+        return value.size() >= check.size() ? value.find(check.c_str(), value.size() - check.size()) == value.size() - check.size() : false;
     }
 
 } // namespace ModelController

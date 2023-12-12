@@ -1,22 +1,23 @@
 //!
-//! @file BaseModuleIn.hpp
+//! @file ModuleIn.hpp
 //! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
 //! @brief Class for input values for modules
 //!
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "IBaseModuleIn.hpp"
+#include "IModuleIn.hpp"
 #include "EventHandling.hpp"
-#include "BaseModuleOut.hpp"
+#include "ModuleOut.hpp"
+#include "Utils.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class BaseModuleOut;
+    class ModuleOut;
 
     template <typename T>
-    class BaseModuleIn : public IBaseModuleIn
+    class ModuleIn : public IModuleIn
     {
         private:
             //!
@@ -31,6 +32,7 @@ namespace ModelController
             //! @brief Listener called, if new output module was created
             //!
             Event<std::string>::Listener* OnModuleOutCreated = nullptr;
+
         protected:
             //!
             //! @brief Path to the connected output module
@@ -43,14 +45,14 @@ namespace ModelController
             //!
             void OnOutputCreated(std::string pathCreatedOutput)
             {
-                Logger::trace("BaseModuleIn::OnOutputCreated(" + pathCreatedOutput + ") - Module: " + this->GetPath());
+                Logger::trace("ModuleIn::OnOutputCreated(" + pathCreatedOutput + ") - Module: " + this->GetPath());
                 bool outputAvailable = pathCreatedOutput == pathConnectedModuleOut;
 
-                Logger::trace("wildcard: \t" + IBaseModuleOut::wildcardSuffix);
+                Logger::trace("wildcard: \t" + IModuleOut::wildcardSuffix);
                 Logger::trace("pathCreatedOutput: \t" + pathCreatedOutput);
                 Logger::trace("pathConnectedModuleOut: \t" + pathConnectedModuleOut);
 
-                size_t wildcardSize = IBaseModuleOut::wildcardSuffix.size();
+                size_t wildcardSize = IModuleOut::wildcardSuffix.size();
                 size_t pathCreatedOutputSize = pathCreatedOutput.size();
                 size_t pathConnectedModuleOutSize = pathConnectedModuleOut.size();
 
@@ -62,7 +64,7 @@ namespace ModelController
                 if (!outputAvailable
                     && pathConnectedModuleOutSize >= pathCreatedOutputSize - wildcardSize
                     && pathCreatedOutputSize > wildcardSize
-                    && pathCreatedOutput.compare(pathCreatedOutputSize - wildcardSize, wildcardSize, IBaseModuleOut::wildcardSuffix) == 0
+                    && pathCreatedOutput.compare(pathCreatedOutputSize - wildcardSize, wildcardSize, IModuleOut::wildcardSuffix) == 0
                     && pathConnectedModuleOut.compare(0, pathCreatedOutputSize - wildcardSize, pathCreatedOutput.substr(0, pathCreatedOutputSize - wildcardSize)) == 0)
                 {
                     outputAvailable = true;
@@ -71,8 +73,9 @@ namespace ModelController
                 //! Only set listener, if not set yet
                 if (OnOutputChanged == nullptr && outputAvailable)
                 {
+                    Logger::trace("Try to find connected output with path: " + pathConnectedModuleOut);
                     //! Find connected output
-                    BaseModuleOut<T>* connectedOutput = BaseModuleOut<T>::GetModuleOutput(pathConnectedModuleOut);
+                    ModuleOut<T>* connectedOutput = ModuleOut<T>::GetModuleOutput(pathConnectedModuleOut);
                     if (connectedOutput != nullptr)
                     {
                         Logger::trace("Connected output found");
@@ -84,18 +87,43 @@ namespace ModelController
                     //! Create Listener to ModuleOutCreated event, if no matching connectedOutput was found
                     else if (OnModuleOutCreated == nullptr)
                     {
-                        OnModuleOutCreated = new Event<std::string>::Listener(&IBaseModuleOut::ModuleOutCreated, [&](std::string path){ this->OnOutputCreated(path); } );
+                        OnModuleOutCreated = new Event<std::string>::Listener(&IModuleOut::ModuleOutCreated, [&](std::string path){ this->OnOutputCreated(path); } );
                     }
                 }
             }
             //!
-            //! @brief Set value of the input
+            //! @brief Get the Path Connected Module Out object out of the config
             //!
-            //! @param value Value to be set to input
-            //! @return true Value was successfully set to input
-            //! @return false Value could not be set to input
+            //! @param name Name of the actual object (ModuleIn)
+            //! @param parentConfig Json config of the parent object or json string with path to connected output module
+            //! @return std::string Extracted path of the connected output module, empty string if not found in parentConfig
             //!
-            virtual bool SetInputValue(T value) = 0;
+            std::string GetPathConnectedModuleOut(std::string name, JsonVariant parentConfig)
+            {
+                std::string path;
+                Logger::trace("ModuleIn::GetPathConnectedModuleOut(" + name + ", " + parentConfig.as<std::string>() + ")");
+                if (parentConfig.is<JsonObject>())
+                {
+                    Logger::trace("Parent config is JsonObject");
+                    if (parentConfig[name].is<std::string>())
+                    {
+                        Logger::trace("Key is set in config");
+                        path = parentConfig[name].as<std::string>();
+                    }
+                }
+                else if (parentConfig.is<std::string>())
+                {
+                    Logger::trace("Parent config is string");
+                    path = parentConfig.as<std::string>();
+                }
+                Logger::trace("Path of connected module out is: " + path + " - size: " + std::to_string(path.size()));
+                return path;
+            }
+            //!
+            //! @brief Listener called, if input value changed
+            //!
+            typename Event<T>::Listener* inputChanged = nullptr;
+
         public:
             //!
             //! @brief Event raised, if value changed
@@ -105,49 +133,57 @@ namespace ModelController
             //! @brief Construct a new input module
             //!
             //! @param name Name of the connector
-            //! @param config Json config of the connector
+            //! @param pathConnectedModuleOut Path of the connected output
+            //! @param inputChanged Function called, if input changed
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseModuleIn(std::string name, JsonVariant config, BaseModule* parent = nullptr)
+            ModuleIn(std::string name, std::string pathConnectedModuleOut, std::function<void(T)> onInputChanged, BaseModule* parent = nullptr)
+                : IModuleIn(name, parent, GetDataTypeById(typeid(T))),
+                pathConnectedModuleOut(pathConnectedModuleOut)
             {
-                Initialize(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, ModuleType::eInput, GetDataTypeById(typeid(T)));
-                if (config.is<JsonObject>() && config["connectedOut"].is<std::string>())
+                this->inputChanged = new typename Event<T>::Listener(&(this->ValueChangedEvent), onInputChanged);
+                Logger::trace("ModuleIn::ModuleIn(" + name + ", " + this->pathConnectedModuleOut + ")");
+                if (!this->pathConnectedModuleOut.empty() && this->pathConnectedModuleOut != "none")
                 {
-                    pathConnectedModuleOut = config["connectedOut"].as<std::string>();
-                }
-                else if (config.is<std::string>())
-                {
-                    pathConnectedModuleOut = config.as<std::string>();
-                }
-                if (!pathConnectedModuleOut.empty())
-                {
-                    OnOutputCreated(pathConnectedModuleOut);
+                    OnOutputCreated(this->pathConnectedModuleOut);
                 }
                 ModuleInCreated(this->GetPath());
+                if (this->pathConnectedModuleOut.empty() && !Utils::StartsWith(GetPath(), "/Connectors/mqtt"))
+                {
+                    this->pathConnectedModuleOut = "/Connectors/mqtt" + GetShortPath();
+                    Logger::trace("Creating connection to default connector for " + this->GetPath());
+                    this->OnOutputCreated(this->pathConnectedModuleOut);
+                }
             }
             //!
             //! @brief Construct a new input module
             //!
             //! @param name Name of the connector
-            //! @param pathConnectedModuleOut Path of the connected output
+            //! @param inputChanged Function called, if input changed
             //! @param parent Parent of the Connector (normally pass this)
             //!
-            BaseModuleIn(std::string name, std::string pathConnectedModuleOut, BaseModule* parent = nullptr)
+            ModuleIn(std::string name, std::function<void(std::string)> onInputChanged, BaseModule* parent = nullptr)
+                : ModuleIn<T>(name, "none", [=](T value){ onInputChanged(Utils::ToString(value)); }, parent)
             {
-                Logger::trace("BaseModuleIn::BaseModuleIn(" + name + ", " + pathConnectedModuleOut + ")");
-                this->pathConnectedModuleOut = pathConnectedModuleOut;
-                Initialize(name, parent, false, ModuleType::eInput, GetDataTypeById(typeid(T)));
-                if (!pathConnectedModuleOut.empty())
-                {
-                    OnOutputCreated(pathConnectedModuleOut);
-                }
-                ModuleInCreated(this->GetPath());
+            }
+            //!
+            //! @brief Construct a new input module
+            //!
+            //! @param name Name of the connector
+            //! @param parentConfig Json config of the parent object or json string with path to connected output module
+            //! @param inputChanged Function called, if input changed
+            //! @param parent Parent of the Connector (normally pass this)
+            //!
+            ModuleIn(std::string name, JsonVariant parentConfig, std::function<void(T)> onInputChanged, BaseModule* parent = nullptr)
+                : ModuleIn<T>(name, GetPathConnectedModuleOut(name, parentConfig), onInputChanged, parent)
+            {
             }
             //!
             //! @brief Destruction of the Base Module In object
             //!
-            virtual ~BaseModuleIn()
+            virtual ~ModuleIn()
             {
+                delete inputChanged;
                 delete OnOutputChanged;
                 delete OnModuleOutCreated;
             }
@@ -180,11 +216,8 @@ namespace ModelController
             {
                 if (actualValue != value)
                 {
-                    if (SetInputValue(value))
-                    {
-                        actualValue = value;
-                        ValueChangedEvent(GetValue());
-                    }
+                    actualValue = value;
+                    ValueChangedEvent(GetValue());
                 }
             }
             //!
@@ -200,11 +233,11 @@ namespace ModelController
             //! @brief Get the module input by path
             //!
             //! @param connectorPath Path of the input connector
-            //! @return BaseModuleIn<T>* InputConnector with path
+            //! @return ModuleIn<T>* InputConnector with path
             //!
-            static BaseModuleIn<T>* GetModuleInput(std::string connectorPath)
+            static ModuleIn<T>* GetModuleInput(std::string connectorPath)
             {
-                return GetModule<BaseModuleIn<T>>(connectorPath, ModuleType::eInput, GetDataTypeById(typeid(T)));
+                return GetModule<ModuleIn<T>>(connectorPath, ModuleType::eInput, GetDataTypeById(typeid(T)));
             }
     };
 

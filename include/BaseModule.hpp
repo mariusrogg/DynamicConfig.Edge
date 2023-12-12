@@ -10,6 +10,8 @@
 #include <ArduinoJson.h>
 #include <string>
 #include <vector>
+#include "Utils.hpp"
+#include "Logger.hpp"
 
 namespace ModelController
 {
@@ -104,6 +106,12 @@ namespace ModelController
             //! @brief Default config file path
             //!
             static std::string configFilePath;
+            //!
+            //! @brief Set the config to the module
+            //!
+            //! @param config Config to be set
+            //!
+            void SetConfig(JsonObject config);
 
         protected:
             //!
@@ -123,25 +131,21 @@ namespace ModelController
             //! @return BaseModule* Child, nullptr if not found
             //!
             virtual BaseModule* GetChild(std::string modulePath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined);
-            //!
-            //! @brief Initialize properties of the module
-            //!
-            //! @param name Name of the module
-            //! @param parent Parent of the module (normally pass this)
-            //! @param createShortPath True if short path is created from actual object
-            //! @param type Type of the module
-            //! @param dataType DataType of the module
-            //!
-            void Initialize(std::string name, BaseModule* parent = nullptr, bool createShortPath = false, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
         public:
             //!
             //! @brief Root module of the hardware configuration
             //!
-            static BaseModule* rootModule;
+            static BaseModule* rootModule; // ToDo: Make RootModule class (preferably singleton)
             //!
-            //! @brief Construct a new Base Module object
+            //! @brief Construct a new module object
             //!
-            BaseModule();
+            //! @param name Name of the module
+            //! @param config Config of the module
+            //! @param parent Parent of the module (normally pass this)
+            //! @param type Type of the module
+            //! @param dataType DataType of the module
+            //!
+            BaseModule(std::string name, JsonObject config, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
             //!
             //! @brief Construct a new module object
             //!
@@ -156,6 +160,13 @@ namespace ModelController
             //! @brief Destruction of the Base Module object
             //!
             virtual ~BaseModule();
+            //!
+            //! @brief Generate module from json
+            //!
+            //! @param moduleConfig Config of the module
+            //! @return BaseModule* Created module
+            //!
+            static BaseModule* GenerateModule(std::string name, JsonObject moduleConfig, BaseModule* parent = nullptr);
             //!
             //! @brief Default config file path
             //!
@@ -207,9 +218,12 @@ namespace ModelController
             template<class T>
             static T* GetModule(std::string modulePath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined)
             {
-                //! Remove "/root" or "root" from beginning of the path
-                modulePath = modulePath.substr(modulePath.find_first_not_of('/'));
-                modulePath = modulePath.substr(modulePath.find_first_not_of("root"));
+                //! Remove "/" from beginning and end of the path
+                modulePath = Utils::Trim(modulePath, "/");
+                if (rootModule == nullptr)
+                {
+                    Logger::trace("Root module not created yet");
+                }
                 return rootModule == nullptr ? nullptr : rootModule->GetChildModule<T>(modulePath, type, dataType);
             }
             //!
@@ -218,10 +232,6 @@ namespace ModelController
             //! @param config Json object with new hardware config
             //!
             static void UpdateConfig(JsonObject config);
-            //!
-            //! @brief Initialize hardware configuration
-            //!
-            static void InitConfig(std::string configFilePath = defaultConfigFile);
             //!
             //! @brief Get the config of the connector
             //!

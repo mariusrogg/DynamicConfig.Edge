@@ -35,6 +35,9 @@ namespace ModelController
     //!
     void OnboardPWM::SetChannel(uint32_t frequency, uint8_t resolution)
     {
+        Logger::trace("Channel: " + std::to_string(channel));
+        Logger::trace("Resolution: " + std::to_string(resolution));
+        Logger::trace("Frequency: " + std::to_string(frequency));
         this->resolution = resolution;
         this->frequency = frequency;
         if (channel >= 0)
@@ -42,6 +45,7 @@ namespace ModelController
             ledcSetup(channel, frequency, resolution);
             for (std::vector<uint8_t>::iterator it = pins.begin(); it != pins.end(); it++)
             {
+                Logger::trace("pin: " + std::to_string(*it));
                 ledcDetachPin(*it);
                 ledcAttachPin(*it, channel);
             }
@@ -50,8 +54,9 @@ namespace ModelController
     //!
     //! @brief Set output value to the PWM
     //!
-    bool OnboardPWM::SetOutputValue(double value)
+    bool OnboardPWM::SetValue(double value)
     {
+        Logger::trace("Set value " + std::to_string(value) + " to " + GetPath());
         bool retVal = false;
         uint32_t duty = value / 100 * (pow(2, resolution) - 1);
         if (channel >= 0)
@@ -64,8 +69,9 @@ namespace ModelController
     //!
     //! @brief Construct a new Onboard PWM object
     //!
-    OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseConnector* parent)
-        : BaseOutputConnector<double>(name, config, parent)
+    OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseModule* parent)
+        : BaseModule(name, config, parent),
+        in("in", config, [&](double value) { this->SetValue(value); }, this)
     {
         Logger::trace("OnboardPWM::OnboardPWM(" + name + ", jsonConfig,  " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
 

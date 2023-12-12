@@ -6,15 +6,17 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseOutputConnector.hpp"
+#include "BaseModule.hpp"
+#include "ModuleIn.hpp"
 #include <vector>
 #include <map>
 
 namespace ModelController
 {
-    class OnboardPWM : public BaseOutputConnector<double>
+    class OnboardPWM : public BaseModule
     {
     private:
+        ModuleIn<double> in;
         //!
         //! @brief PWM-Channels already used by the program
         //!
@@ -61,7 +63,7 @@ namespace ModelController
         //! @return true Value was successfully set to output
         //! @return false Value could not be set to output
         //!
-        virtual bool SetOutputValue(double value);
+        bool SetValue(double value);
 
     public:
         //!
@@ -71,11 +73,11 @@ namespace ModelController
         //!
         //! @brief Default cycle frequency of the channel
         //!
-        static const uint32_t DefaultFrequency = 5000;
+        static const uint32_t DefaultFrequency = 500;
         //!
         //! @brief Default resolution of the channel
         //!
-        static const uint8_t DefaultResolution = 8;
+        static const uint8_t DefaultResolution = 16;
         //!
         //! @brief Construct a new PWMChannel object
         //!
@@ -83,7 +85,7 @@ namespace ModelController
         //! @param config Config of the connector
         //! @param parent Parent of the Connector (normally pass this)
         //!
-        OnboardPWM(std::string name, JsonObject config, BaseConnector* parent = nullptr);
+        OnboardPWM(std::string name, JsonObject config, BaseModule* parent = nullptr);
         //!
         //! @brief Destroy the PWMChannel object
         //!
