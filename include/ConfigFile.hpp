@@ -25,7 +25,7 @@ namespace ModelController
             //!
             //! @brief Json document, where json config is stored
             //!
-            static DynamicJsonDocument configDoc;
+            static JsonDocument configDoc;
 
         public:
             //!

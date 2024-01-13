@@ -16,7 +16,7 @@ namespace ModelController
     //!
     //! @brief Json config document
     //!
-    DynamicJsonDocument ConfigFile::configDoc(32768);
+    JsonDocument ConfigFile::configDoc;
     //!
     //! @brief Event raised, if config was reloaded
     //!
@@ -160,7 +160,6 @@ namespace ModelController
             {
                 JsonObject objParentConfig = parentConfig.as<JsonObject>();
                 objParentConfig.remove(name);
-                configDoc.garbageCollect();
                 //! @brief Remove parent element, if it does not contain more children than the deleted one
                 if (path.find_first_not_of('/') != std::string::npos && (objParentConfig.isNull() || (objParentConfig.size() == 0)))
                 {

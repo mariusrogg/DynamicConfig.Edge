@@ -7,7 +7,7 @@
 //!
 #include "Logger.hpp"
 
-Logger::Level Logger::minLevel = Logger::Level::eTrace;
+Logger::Level Logger::minLevel = Logger::Level::eDebug;
 
 //!
 //! @brief Swith depending on level and return short name of level
