@@ -85,7 +85,7 @@ bool WiFiHandler::Check()
             reconnects = 0;
             if (!staConnected)
             {
-                Logger::info("WiFi: STA Connected");
+                Logger::info("WiFi: STA Connected IP:" + std::string(WiFi.localIP().toString().c_str()) + " Hostname: " + WiFi.getHostname());
                 STAConnected.Raise();
                 staConnected = true;
             }

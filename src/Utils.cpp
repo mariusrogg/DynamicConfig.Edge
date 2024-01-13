@@ -6,6 +6,7 @@
 //! @copyright Copyright (c) 2023
 //!
 #include "Utils.hpp"
+#include "esp_random.h"
 
 namespace ModelController
 {
@@ -53,6 +54,18 @@ namespace ModelController
     bool Utils::EndsWith(std::string value, std::string check)
     {
         return value.size() >= check.size() ? value.find(check.c_str(), value.size() - check.size()) == value.size() - check.size() : false;
+    }
+    //!
+    //! @brief Returns randum number with specified length
+    //!
+    std::string Utils::GetRandomNumber(int length)
+    {
+        std::string random = std::to_string(esp_random());
+        if (random.size() >= length)
+        {
+            random = random.substr(0, length);
+        }
+        return random;
     }
 
 } // namespace ModelController

@@ -98,7 +98,8 @@ namespace ModelController
         off(config["off"].is<std::string>() ? config["off"].as<std::string>() : "{}"),
         activate("active", config, [&](bool value) { this->OnActivateChanged(value); }, this),
         manualTarget("manualTarget", config, [&](double value) { this->OnManualTargetChanged(value); }, this),
-        targetMode("targetMode", config, [&](std::string value) { this->OnTargetModeChanged(value); }, this)
+        targetMode("targetMode", config, [&](std::string value) { this->OnTargetModeChanged(value); }, this),
+        defaultMode("defaultMode", config, "", this)
     {
         JsonObject jsonModes = config["modes"].as<JsonObject>();
         for (JsonObject::iterator it = jsonModes.begin(); it != jsonModes.end(); ++it)
@@ -107,10 +108,6 @@ namespace ModelController
             {
                 modes[it->key().c_str()] = new SequenceMode(it->value().as<JsonObject>());
             }
-        }
-        if (config["defaultMode"].is<std::string>())
-        {
-            defaultMode = config["defaultMode"].as<std::string>();
         }
         activeMode = GetMode(defaultMode);
     }

@@ -58,7 +58,7 @@ namespace ModelController
     {
         Logger::trace("Set value " + std::to_string(value) + " to " + GetPath());
         bool retVal = false;
-        uint32_t duty = value / 100 * (pow(2, resolution) - 1);
+        uint32_t duty = value / 100 * (pow(2, resolution.GetValue()) - 1);
         if (channel >= 0)
         {
             ledcWrite(channel, duty);
@@ -71,7 +71,9 @@ namespace ModelController
     //!
     OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseModule* parent)
         : BaseModule(name, config, parent),
-        in("in", config, [&](double value) { this->SetValue(value); }, this)
+        in("in", config, [&](double value) { this->SetValue(value); }, this),
+        resolution("resolution", config, 16, this),
+        frequency("frequency", config, 500, this)
     {
         Logger::trace("OnboardPWM::OnboardPWM(" + name + ", jsonConfig,  " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
 
@@ -92,18 +94,6 @@ namespace ModelController
                     Logger::trace("Pin " + std::to_string(it->as<uint8_t>()) + " added to OnboardPWM " + GetPath());
                 }
             }
-        }
-        JsonVariant jFrequency = config["frequency"];
-        uint32_t frequency = DefaultFrequency;
-        if (jFrequency.is<uint8_t>())
-        {
-            frequency = jFrequency.as<uint32_t>();
-        }
-        JsonVariant jResolution = config["resolution"];
-        uint8_t resolution = DefaultResolution;
-        if (jResolution.is<uint8_t>())
-        {
-            resolution = jResolution.as<uint8_t>();
         }
         SetChannel(frequency, resolution);
     }
@@ -135,14 +125,8 @@ namespace ModelController
         }
         config << "]";
         config << ", \"type\": \"" << type << "\"";
-        if (resolution != DefaultResolution)
-        {
-            config << ", \"resolution\": " << resolution;
-        }
-        if (frequency != DefaultFrequency)
-        {
-            config << ", \"frequency\": " << frequency;
-        }
+        config << ", \"resolution\": " << resolution;
+        config << ", \"frequency\": " << frequency;
         return config.str();
     }
 } // namespace ModelController

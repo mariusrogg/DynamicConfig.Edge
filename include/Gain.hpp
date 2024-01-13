@@ -10,44 +10,45 @@
 #include "ModuleOut.hpp"
 #include "ModuleIn.hpp"
 #include "BaseModule.hpp"
+#include "ConfigItem.hpp"
 
 namespace ModelController
 {
     class Gain : public BaseModule
     {
-    private:
-        //!
-        //! @brief Input value
-        //!
-        ModuleIn<double> in;
-        //!
-        //! @brief Output value
-        //!
-        ModuleOut<double> out;
-        //!
-        //! @brief Multiplicator
-        //!
-        double gainValue = 1;
-        //!
-        //! @brief Calculate output depending on input0
-        //!
-        //! @param value Input value
-        //!
-        void calculateOut(double value);
+        private:
+            //!
+            //! @brief Input value
+            //!
+            ModuleIn<double> in;
+            //!
+            //! @brief Output value
+            //!
+            ModuleOut<double> out;
+            //!
+            //! @brief Multiplicator
+            //!
+            ConfigItem<double> gain;
+            //!
+            //! @brief Calculate output depending on input0
+            //!
+            //! @param value Input value
+            //!
+            void calculateOut(double value);
 
-    public:
-        //!
-        //! @brief Name of the type for config
-        //!
-        static constexpr const char* type = "gain";
-        //!
-        //! @brief Construct a new Gain object
-        //!
-        //! @param name Name of the gain
-        //! @param config Config
-        //! @param parent Parent module
-        //!
-        Gain(std::string name, JsonObject config, BaseModule* parent = nullptr);
+        public:
+            //!
+            //! @brief Name of the type for config
+            //!
+            static constexpr const char* type = "gain";
+            //!
+            //! @brief Construct a new Gain object
+            //!
+            //! @param name Name of the gain
+            //! @param config Config
+            //! @param parent Parent module
+            //!
+            Gain(std::string name, JsonObject config, BaseModule* parent = nullptr);
     };
 
 } // namespace ModelController

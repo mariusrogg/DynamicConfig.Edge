@@ -13,6 +13,7 @@
 #include <map>
 #include "IModuleOut.hpp"
 #include "LoopEvent.hpp"
+#include "ConfigItem.hpp"
 
 namespace ModelController
 {
@@ -28,25 +29,17 @@ namespace ModelController
             //!
             std::map<std::string, IModuleOut*> mqttInputVariables;
             //!
-            //! @brief Default hostname of the MQTT broker
-            //!
-            static constexpr const char* DefaultServer = "raspberrypi";
-            //!
             //! @brief Hostname of the MQTT broker
             //!
-            std::string serverHostname;
-            //!
-            //! @brief Default MQTT brokers port
-            //!
-            static const uint32_t DefaultPort = 1883;
+            ConfigItem<std::string> serverHostname;
             //!
             //! @brief MQTT brokers port
             //!
-            uint16_t serverPort;
+            ConfigItem<uint16_t> serverPort;
             //!
             //! @brief ClientID (name of the client)
             //!
-            std::string clientID;
+            ConfigItem<std::string> clientID;
             //!
             //! @brief PubSubClient to handle MQTT messages
             //!

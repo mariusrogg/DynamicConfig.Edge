@@ -73,7 +73,6 @@ namespace ModelController
             static void SetConfig(std::string path, T value)
             {
                 GetConfig(path, true).set(value);
-                configDoc.garbageCollect();
                 Save();
                 ConfigChanged(path);
             }

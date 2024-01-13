@@ -43,13 +43,12 @@ namespace ModelController
     //!
     void MQTTClient::reconnect()
     {
-        std::string clientID = this->clientID;
-        if (clientID.empty())
-        {
-            clientID += "ESP32";
-            // ToDo: Generate random ID (mqtt client id size): clientID += esp_random();
-        }
-        if (client.connect(clientID.c_str()))
+        // Conversion of serverHostname to string and in second step to const char* is needed, because otherwise the domain in client is overridden by the client ID (seems to be a bug in PubSubClient)
+        std::string hostnameStr = serverHostname.GetValue();
+        const char* hostname = hostnameStr.c_str();
+        client.setServer(hostname, serverPort.GetValue());
+        Logger::debug(std::string("Connecting to MQTT server on ") + hostname + ":" + std::to_string(serverPort));
+        if (client.connect(clientID.GetValue().c_str()))
         {
             Logger::info("MQTT connected");
             for (std::pair<std::string, IModuleOut*> kvp : mqttInputVariables)
@@ -268,26 +267,11 @@ namespace ModelController
         : BaseModule(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
-        loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0)
+        loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0),
+        serverHostname("server", config, "raspberrypi", this),
+        serverPort("port", config, 1883, this),
+        clientID("clientID", config, "ESP32-" + Utils::GetRandomNumber(18), this)
     {
-        JsonVariant jPort = config["port"];
-        serverPort = DefaultPort;
-        if (jPort.is<uint16_t>())
-        {
-            serverPort = jPort.as<uint16_t>();
-        }
-        JsonVariant jServer = config["server"];
-        serverHostname = DefaultServer;
-        if (jServer.is<std::string>())
-        {
-            serverHostname = jServer.as<std::string>();
-        }
-        JsonVariant jClientID = config["clientID"];
-        if (jClientID.is<std::string>())
-        {
-            clientID = jClientID.as<std::string>();
-        }
-        client.setServer(serverHostname.c_str(), serverPort);
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
 
         IModuleOut::ModuleOutCreated(this->GetPath() + "/*");

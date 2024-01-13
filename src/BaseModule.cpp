@@ -177,6 +177,7 @@ namespace ModelController
     //!
     void BaseModule::SetConfig(JsonObject config)
     {
+        Logger::trace(GetPath() + "\t Config: " + ((JsonVariant)config).as<std::string>());
         for (JsonPair child : config)
         {
             if (child.value().is<JsonObject>())

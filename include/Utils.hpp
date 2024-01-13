@@ -90,5 +90,12 @@ namespace ModelController
             //! @return false Value does not end with check
             //!
             static bool EndsWith(std::string value, std::string check);
+            //!
+            //! @brief Create string containing random number
+            //!
+            //! @param length Length of the returned string
+            //! @return std::string String with random number
+            //!
+            static std::string GetRandomNumber(int length);
     };
 } // namespace ModelController

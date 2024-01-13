@@ -10,6 +10,7 @@
 #include "ModuleIn.hpp"
 #include <vector>
 #include <map>
+#include "ConfigItem.hpp"
 
 namespace ModelController
 {
@@ -32,15 +33,15 @@ namespace ModelController
         //!
         //! @brief Resolution of the channel
         //!
-        uint8_t resolution;
+        ConfigItem<uint8_t> resolution;
         //!
         //! @brief Frequency of the channel
         //!
-        uint32_t frequency;
+        ConfigItem<uint32_t> frequency;
         //!
         //! @brief Pins attached to the channel
         //!
-        std::vector<uint8_t> pins;
+        std::vector<uint8_t> pins;  // ToDo: Config Item for Array
         //!
         //! @brief Get the a free channel
         //!
@@ -53,7 +54,7 @@ namespace ModelController
         //! @param frequency   Cycle Frequency of the channel
         //! @param resolution  Resolution of the channel
         //!
-        void SetChannel(uint32_t frequency = DefaultFrequency, uint8_t resolution = DefaultResolution);
+        void SetChannel(uint32_t frequency, uint8_t resolution);
 
     protected:
         //!
@@ -70,14 +71,6 @@ namespace ModelController
         //! @brief Name of the type for config
         //!
         static constexpr const char* type = "pwm";
-        //!
-        //! @brief Default cycle frequency of the channel
-        //!
-        static const uint32_t DefaultFrequency = 500;
-        //!
-        //! @brief Default resolution of the channel
-        //!
-        static const uint8_t DefaultResolution = 16;
         //!
         //! @brief Construct a new PWMChannel object
         //!

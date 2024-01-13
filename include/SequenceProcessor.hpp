@@ -13,6 +13,7 @@
 #include <map>
 #include "SequenceMode.hpp"
 #include "LoopEvent.hpp"
+#include "ConfigItem.hpp"
 
 namespace ModelController
 {
@@ -60,11 +61,11 @@ namespace ModelController
             //!
             //! @brief Possible modes
             //!
-            std::map<std::string, SequenceMode*> modes;
+            std::map<std::string, SequenceMode*> modes; // ToDo: ConfigItem
             //!
             //! @brief Name of the default mode
             //!
-            std::string defaultMode;
+            ConfigItem<std::string> defaultMode;
             //!
             //! @brief Active mode
             //!
@@ -76,7 +77,7 @@ namespace ModelController
             //!
             //! @brief Sequence on turning mode off
             //!
-            Sequence off;
+            Sequence off;   // ToDo: ConfigItem
             //!
             //! @brief Sequence on turning mode on
             //!
