@@ -4,6 +4,7 @@
 #include "LoopEvent.hpp"
 #include "Logger.hpp"
 #include "ConfigFile.hpp"
+#include "ConfigAPI.hpp"
 
 void setup()
 {
@@ -31,7 +32,7 @@ void loop()
     Logger::debug("start loop");
 
     ModelController::LoopEvent::Raise();
-    WiFiHandler::Check();
+    ModelController::ConfigAPI::Handle(WiFiHandler::Check());
 
     Logger::debug("end loop");
 }
