@@ -106,12 +106,6 @@ namespace ModelController
             //! @brief Default config file path
             //!
             static std::string configFilePath;
-            //!
-            //! @brief Set the config to the module
-            //!
-            //! @param config Config to be set
-            //!
-            void SetConfig(JsonObject config);
 
         protected:
             //!
@@ -122,6 +116,12 @@ namespace ModelController
             //! @brief Data-Type of the module
             //!
             ModuleDataType moduleDataType = ModuleDataType::eUndefined;
+            //!
+            //! @brief Set the config to the module
+            //!
+            //! @param config Config to be set
+            //!
+            virtual void SetConfig(JsonObject config);
             //!
             //! @brief Get child of the object
             //!

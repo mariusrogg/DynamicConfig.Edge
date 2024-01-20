@@ -10,6 +10,11 @@
 namespace ModelController
 {
     //!
+    //! @brief Override and do nothing to ensure, that BaseContainer won't contain BaseContainers as children
+    //!
+    void BaseContainer::SetConfig(JsonObject config)
+    {}
+    //!
     //! @brief Construct a new Base Container object
     //!
     BaseContainer::BaseContainer(std::string name, JsonObject config, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)
