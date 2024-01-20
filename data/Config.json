@@ -1,0 +1,216 @@
+{
+    "wifi":
+    {
+        "ssid": "<Your SSID here>",
+        "password": "<Your WIFI-Password here>"
+    },
+    "Connectors":
+    {
+        "mqtt":
+        {
+            "type": "mqtt",
+            "server": "10.0.10.1",
+            "prefix": "Dev-Kit-0"
+        },
+        "PWM_0":
+        {
+            "pin": [4],
+            "type": "pwm",
+            "in": "/Processors/Taxi/out"
+        },
+        "PWM_1":
+        {
+            "pin": [5],
+            "type": "pwm",
+            "in": "/Processors/Takeoff/out"
+        },
+        "PWM_2":
+        {
+            "pin": [16, 17],
+            "type": "pwm",
+            "in": "/Processors/WingPosition/out"
+        },
+        "PWM_3":
+        {
+            "pin": [18, 19],
+            "type": "pwm",
+            "in": "/Processors/Beacon/out"
+        },
+        "PWM_4":
+        {
+            "pin": [21, 22],
+            "type": "pwm",
+            "in": "/Processors/WingStrobe/out"
+        },
+        "PWM_5":
+        {
+            "pin": [23, 25],
+            "type": "pwm",
+            "in": "/Processors/Logo/out"
+        },
+        "PWM_6":
+        {
+            "pin": [26],
+            "type": "pwm",
+            "in": "/Processors/TailStrobe/out"
+        },
+        "i2c0":
+        {
+            "SDA": 4,
+            "SCL": 5,
+            "type": "i2c",
+            "peripheral":
+            {
+                "PCA9685_0":
+                {
+                    "type": "PCA9685",
+                    "Address": 64
+                }
+            }
+        }
+    },
+    "Processors":
+    {
+        "Gain1":
+        {
+            "type": "gain",
+            "in": "/Connectors/mqtt/in/double4",
+            "out": "/Connectors/mqtt/out/double4",
+            "gain": 1
+        },
+        "Taxi":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Taxi": 4
+            },
+            "defaultMode": "Taxi",
+            "on": "{0;2000;60}",
+            "off": "{60;300;0}",
+            "modes":
+            {
+                "Taxi":
+                {
+                    "on": true,
+                    "off": true,
+                    "mode": "{60}"
+                }
+            }
+        },
+        "Takeoff":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Takeoff": 5
+            },
+            "defaultMode": "Takeoff",
+            "on": "{0;1000;100}",
+            "off": "{100;300;0}",
+            "modes":
+            {
+                "Takeoff":
+                {
+                    "on": true,
+                    "off": true,
+                    "mode": "{100}"
+                }
+            }
+        },
+        "WingPosition":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Left": 16,
+                "Right": 17
+            },
+            "defaultMode": "Position",
+            "modes":
+            {
+                "Position":
+                {
+                    "mode": "{100}"
+                }
+            }
+        },
+        "Beacon":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Top": 18,
+                "Bottom": 19
+            },
+            "defaultMode": "Beacon",
+            "modes":
+            {
+                "Beacon":
+                {
+                    "sync": 1000,
+                    "mode": "{{0;500}{100;100}{0;400}}"
+                }
+            }
+        },
+        "WingStrobe":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Left": 21,
+                "Right": 22
+            },
+            "defaultMode": "Strobe",
+            "modes":
+            {
+                "Strobe":
+                {
+                    "sync": 1000,
+                    "mode": "{{100;50}{0;50}{100;50}{0;850}}"
+                }
+            }
+        },
+        "Logo":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Left": 23,
+                "Right": 25
+            },
+            "defaultMode": "Logo",
+            "modes":
+            {
+                "Logo":
+                {
+                    "mode": "{80}"
+                }
+            }
+        },
+        "TailStrobe":
+        {
+            "shortPath": true,
+            "type": "sequence",
+            "pins":
+            {
+                "Tail": 26
+            },
+            "defaultMode": "Strobe",
+            "modes":
+            {
+                "Strobe":
+                {
+                    "sync": 1000,
+                    "mode": "{{100;100}{0;900}}"
+                }
+            }
+        }
+    }
+}
