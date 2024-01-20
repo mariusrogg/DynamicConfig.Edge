@@ -4,11 +4,84 @@
         "ssid": "<Your SSID here>",
         "password": "<Your WIFI-Password here>"
     },
-    "devices":
+    "Connectors":
     {
+        "mqtt":
+        {
+            "type": "mqtt",
+            "server": "10.0.10.1",
+            "prefix": "Dev-Kit-0"
+        },
+        "PWM_0":
+        {
+            "pin": [4],
+            "type": "pwm",
+            "in": "/Processors/Taxi/out"
+        },
+        "PWM_1":
+        {
+            "pin": [5],
+            "type": "pwm",
+            "in": "/Processors/Takeoff/out"
+        },
+        "PWM_2":
+        {
+            "pin": [16, 17],
+            "type": "pwm",
+            "in": "/Processors/WingPosition/out"
+        },
+        "PWM_3":
+        {
+            "pin": [18, 19],
+            "type": "pwm",
+            "in": "/Processors/Beacon/out"
+        },
+        "PWM_4":
+        {
+            "pin": [21, 22],
+            "type": "pwm",
+            "in": "/Processors/WingStrobe/out"
+        },
+        "PWM_5":
+        {
+            "pin": [23, 25],
+            "type": "pwm",
+            "in": "/Processors/Logo/out"
+        },
+        "PWM_6":
+        {
+            "pin": [26],
+            "type": "pwm",
+            "in": "/Processors/TailStrobe/out"
+        },
+        "i2c0":
+        {
+            "SDA": 4,
+            "SCL": 5,
+            "type": "i2c",
+            "peripheral":
+            {
+                "PCA9685_0":
+                {
+                    "type": "PCA9685",
+                    "Address": 64
+                }
+            }
+        }
+    },
+    "Processors":
+    {
+        "Gain1":
+        {
+            "type": "gain",
+            "in": "/Connectors/mqtt/in/double4",
+            "out": "/Connectors/mqtt/out/double4",
+            "gain": 1
+        },
         "Taxi":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Taxi": 4
@@ -28,7 +101,8 @@
         },
         "Takeoff":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Takeoff": 5
@@ -46,9 +120,10 @@
                 }
             }
         },
-        "Wing Position":
+        "WingPosition":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Left": 16,
@@ -65,7 +140,8 @@
         },
         "Beacon":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Top": 18,
@@ -81,9 +157,10 @@
                 }
             }
         },
-        "Wing Strobe":
+        "WingStrobe":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Left": 21,
@@ -101,7 +178,8 @@
         },
         "Logo":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Left": 23,
@@ -116,9 +194,10 @@
                 }
             }
         },
-        "Tail Strobe":
+        "TailStrobe":
         {
-            "type": "pwm",
+            "shortPath": true,
+            "type": "sequence",
             "pins":
             {
                 "Tail": 26

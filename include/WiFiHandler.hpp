@@ -1,9 +1,15 @@
+//!
+//! @file WiFiHandler.hpp
+//! @author Marius Roggenbuck (roggenbuckmarius@gmail.com)
+//! @brief Class for connecting to WiFi
+//!
+//! @copyright Copyright (c) 2023
+//!
 #pragma once
 #include "WiFi.h"
 #include "ArduinoJson.h"
-//!
-//! @brief Class for connecting to WiFi
-//!
+#include "EventHandling.hpp"
+
 class WiFiHandler
 {
 private:
@@ -35,8 +41,18 @@ private:
     //! @brief True if AP is active
     //!
     static bool activeAP;
-
-public:
+    //!
+    //! @brief SSID of the wifi station
+    //!
+    static std::string ssid;
+    //!
+    //! @brief WiFi-Password
+    //!
+    static std::string password;
+    //!
+    //! @brief True if WiFi-Station is connected
+    //!
+    static bool staConnected;
     //!
     //! @brief Connect to STA
     //!
@@ -61,6 +77,16 @@ public:
     //! @return false AP not started
     //!
     static bool BeginAP(const char* ssid, const char* password);
+
+public:
+    //!
+    //! @brief Event raised, if AP is initialized
+    //!
+    static ModelController::Event<> APInitialized;
+    //!
+    //! @brief Event raised if STA is connected
+    //!
+    static ModelController::Event<> STAConnected;
     //!
     //! @brief Check if WiFi is connected
     //!
@@ -68,4 +94,23 @@ public:
     //! @return false WiFi is not connected
     //!
     static bool Check();
+    //!
+    //! @brief Set ssid and password for WiFi-Connection
+    //!
+    //! @param ssid SSID of the WiFi-Station
+    //! @param password Password of the WiFi-Station
+    //!
+    static void SetSSIDPassword(std::string ssid, std::string password);
+    //!
+    //! @brief Get ssid
+    //!
+    //! @return std::string SSID of the WiFi-Station
+    //!
+    static std::string GetSSID();
+    //!
+    //! @brief Get Password
+    //!
+    //! @return std::string Password of the WiFi-Station
+    //!
+    static std::string GetPassword();
 };
