@@ -264,7 +264,7 @@ namespace ModelController
     //! @brief Construct a new MQTTClient::MQTTClient object
     //!
     MQTTClient::MQTTClient(std::string name, JsonObject config, BaseModule* parent)
-        : BaseModule(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
+        : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
         loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0),

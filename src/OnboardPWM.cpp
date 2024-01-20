@@ -70,7 +70,7 @@ namespace ModelController
     //! @brief Construct a new Onboard PWM object
     //!
     OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseModule* parent)
-        : BaseModule(name, config, parent),
+        : BaseContainer(name, config, parent),
         in("in", config, [&](double value) { this->SetValue(value); }, this),
         resolution("resolution", config, 16, this),
         frequency("frequency", config, 500, this)

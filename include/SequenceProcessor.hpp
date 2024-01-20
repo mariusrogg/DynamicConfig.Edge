@@ -6,7 +6,7 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseModule.hpp"
+#include "BaseContainer.hpp"
 #include "ModuleIn.hpp"
 #include "ModuleOut.hpp"
 #include "Sequence.hpp"
@@ -17,7 +17,7 @@
 
 namespace ModelController
 {
-    class SequenceProcessor : public BaseModule
+    class SequenceProcessor : public BaseContainer
     {
         private:
             //!

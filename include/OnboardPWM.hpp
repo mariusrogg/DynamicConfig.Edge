@@ -6,7 +6,7 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseModule.hpp"
+#include "BaseContainer.hpp"
 #include "ModuleIn.hpp"
 #include <vector>
 #include <map>
@@ -14,7 +14,7 @@
 
 namespace ModelController
 {
-    class OnboardPWM : public BaseModule
+    class OnboardPWM : public BaseContainer
     {
     private:
         ModuleIn<double> in;

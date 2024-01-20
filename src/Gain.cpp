@@ -20,7 +20,7 @@ namespace ModelController
     //! @brief Construct a new Gain object
     //!
     Gain::Gain(std::string name, JsonObject config, BaseModule* parent)
-            : BaseModule(name, config, parent, ModuleType::eNone, ModuleDataType::eDouble),
+            : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eDouble),
             in("in", config, [&](double value) { calculateOut(value); }, this),
             out("out", config, this),
             gain("gain", config, 1, this)

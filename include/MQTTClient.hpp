@@ -8,7 +8,7 @@
 #pragma once
 
 #include "PubSubClient.h"
-#include "BaseModule.hpp"
+#include "BaseContainer.hpp"
 #include "WiFi.h"
 #include <map>
 #include "IModuleOut.hpp"
@@ -17,7 +17,7 @@
 
 namespace ModelController
 {
-    class MQTTClient : public BaseModule
+    class MQTTClient : public BaseContainer
     {
         private:
             //!

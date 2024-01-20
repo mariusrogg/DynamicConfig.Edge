@@ -9,12 +9,12 @@
 #pragma once
 #include "ModuleOut.hpp"
 #include "ModuleIn.hpp"
-#include "BaseModule.hpp"
+#include "BaseContainer.hpp"
 #include "ConfigItem.hpp"
 
 namespace ModelController
 {
-    class Gain : public BaseModule
+    class Gain : public BaseContainer
     {
         private:
             //!
