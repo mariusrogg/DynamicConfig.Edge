@@ -15,6 +15,14 @@ namespace ModelController
     void BaseContainer::SetConfig(JsonObject config)
     {}
     //!
+    //! @brief Delete config and object
+    //!
+    void BaseContainer::Delete()
+    {
+        ConfigFile::Remove(GetPath());
+        delete this;
+    }
+    //!
     //! @brief Construct a new Base Container object
     //!
     BaseContainer::BaseContainer(std::string name, JsonObject config, BaseModule* parent, BaseModule::ModuleType type, BaseModule::ModuleDataType dataType)

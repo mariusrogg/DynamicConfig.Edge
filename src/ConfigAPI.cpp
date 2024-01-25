@@ -22,22 +22,37 @@ namespace ModelController
     //!
     bool ConfigAPI::initialized = false;
     //!
-    //! @brief Send parameters on specified path
+    //! @brief Iterate through args until arg with name path was found
     //!
-    void ConfigAPI::handleGetParameters()
+    std::string ConfigAPI::GetPathFromArgs()
     {
-        std::string message;
         std::string path = "";
-        for (int i = 0; i < server.args(); i++)
+        for (int i = 0; i < server.args() && path.empty(); i++)
         {
             if (server.argName(i) == "path")
             {
                 path = server.arg(i).c_str();
             }
         }
-        message = ModelController::ConfigFile::GetConfig(path).as<std::string>();
+        return path;
+    }
+    //!
+    //! @brief Send parameters on specified path
+    //!
+    void ConfigAPI::handleGetParameters()
+    {
+        std::string message;
+        message = ModelController::ConfigFile::GetConfig(GetPathFromArgs()).as<std::string>();
         // ToDo: Maybe handle this later via BaseModule::GetParameters (or similary)
-        server.send(200, "text/plain", message.c_str());
+        server.send(200, "text/json", message.c_str());
+    }
+    //!
+    //! @brief Delete module on specified path
+    //!
+    void ConfigAPI::handleDelete()
+    {
+        BaseModule::Delete(GetPathFromArgs());
+        server.send(200, "text/plain");
     }
     //!
     //! @brief Initialize routes
@@ -45,6 +60,7 @@ namespace ModelController
     void ConfigAPI::Initialize()
     {
         server.on("/Parameter", handleGetParameters);
+        server.on("/Delete", HTTP_POST, handleDelete);
     }
     //!
     //! @brief Initialize server if not done yet, handle client requests and start server if not done yet or wifi disconnected

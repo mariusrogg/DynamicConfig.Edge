@@ -7,6 +7,7 @@
 //!
 #pragma once
 #include "BaseModule.hpp"
+#include "ConfigFile.hpp"
 
 namespace ModelController
 {
@@ -19,6 +20,10 @@ namespace ModelController
             //! @param config Config to be set
             //!
             virtual void SetConfig(JsonObject config) override;
+            //!
+            //! @brief Delete container
+            //!
+            virtual void Delete() override;
         public:
             //!
             //! @brief Construct a new Base Container object

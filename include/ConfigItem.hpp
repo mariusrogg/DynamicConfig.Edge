@@ -24,6 +24,16 @@ namespace ModelController
             //! @brief Default value of the config item
             //!
             T defaultValue;
+        protected:
+            //!
+            //! @brief Delete ConfigItem (reset to default)
+            //!
+            virtual void Delete() override
+            {
+                value = defaultValue;
+                ConfigFile::SetConfig(GetPath(), value);
+            }
+
         public:
             //!
             //! @brief Construct a new Config Item object
@@ -38,6 +48,7 @@ namespace ModelController
                 value(defaultValue),
                 defaultValue(defaultValue)
             {
+                // ToDo: names with '/'
                 if (parentConfig[name].is<T>())
                 {
                     SetValue(parentConfig[name].as<T>());

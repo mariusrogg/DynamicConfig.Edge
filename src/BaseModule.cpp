@@ -188,6 +188,16 @@ namespace ModelController
         }
     }
     //!
+    //! @brief Delete children of the current module
+    //!
+    void BaseModule::Delete()
+    {
+        for (BaseModule* child : children)
+        {
+            child->Delete();
+        }
+    }
+    //!
     //! @brief Returns child of the module
     //!
     BaseModule* BaseModule::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType)
@@ -358,6 +368,16 @@ namespace ModelController
     std::string BaseModule::GetName() const
     {
         return name;
+    }
+    //!
+    //! @brief Get module with path and call delete on this module
+    //!
+    void BaseModule::Delete(std::string path)
+    {
+        if (BaseModule* module = GetModule<BaseModule>(path))
+        {
+            module->Delete();
+        }
     }
     //!
     //! @brief Update config of the controller

@@ -10,6 +10,7 @@
 #include "WebServer.h"
 #include <string>
 #include "ConfigFile.hpp"
+#include "BaseModule.hpp"
 
 namespace ModelController
 {
@@ -33,9 +34,19 @@ namespace ModelController
             //!
             ConfigAPI() = delete;
             //!
+            //! @brief Extract path out of args
+            //!
+            //! @return std::string Path from args
+            //!
+            static std::string GetPathFromArgs();
+            //!
             //! @brief Handle method to get parameters
             //!
             static void handleGetParameters();
+            //!
+            //! @brief Handle POST request on path /Delete
+            //!
+            static void handleDelete();
             //!
             //! @brief Initialize routes
             //!

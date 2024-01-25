@@ -123,6 +123,10 @@ namespace ModelController
             //!
             virtual void SetConfig(JsonObject config);
             //!
+            //! @brief Delete object, if possible
+            //!
+            virtual void Delete();
+            //!
             //! @brief Get child of the object
             //!
             //! @param modulePath Path of the child
@@ -195,6 +199,12 @@ namespace ModelController
             //! @return std::string Name of the object
             //!
             std::string GetName() const;
+            //!
+            //! @brief Delete module with path
+            //!
+            //! @param path Path to module to be deleted
+            //!
+            static void Delete(std::string path);
             //!
             //! @brief Get a module by path
             //!
