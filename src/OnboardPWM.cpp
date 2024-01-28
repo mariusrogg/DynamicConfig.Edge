@@ -103,6 +103,7 @@ namespace ModelController
     OnboardPWM::~OnboardPWM()
     {
         SetValue(0);
+        usedChannels.erase(remove(usedChannels.begin(), usedChannels.end(), channel), usedChannels.end());
         for (std::vector<uint8_t>::iterator it = pins.begin(); it != pins.end(); it++)
         {
             ledcDetachPin(*it);

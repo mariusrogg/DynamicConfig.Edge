@@ -7,16 +7,19 @@
 //!
 #include "Utils.hpp"
 #include "esp_random.h"
+#include "Logger.hpp"
 
 namespace ModelController
 {
     //!
     //! @brief Remove trim at beginning of origin as long as it is not found anymore
     //!
-    std::string Utils::TrimStart(std::string origin, std::string trim)
+    std::string Utils::TrimStart(std::string origin, std::string trim, int repetition)
     {
-        while (StartsWith(origin, trim))
+        int numberDeletions = 0;
+        while (trim.size() > 0 && StartsWith(origin, trim) && (repetition < 0 || numberDeletions <= repetition))
         {
+            numberDeletions++;
             origin.erase(0, trim.size());
         }
         return origin;
@@ -24,10 +27,12 @@ namespace ModelController
     //!
     //! @brief Remove trim at end of origin as long as it is not found anymore
     //!
-    std::string Utils::TrimEnd(std::string origin, std::string trim)
+    std::string Utils::TrimEnd(std::string origin, std::string trim, int repetition)
     {
-        while (EndsWith(origin, trim))
+        int numberDeletions = 0;
+        while (trim.size() > 0 && EndsWith(origin, trim) && (repetition < 0 || numberDeletions <= repetition))
         {
+            numberDeletions++;
             origin.erase(origin.size() - trim.size(), trim.size());
         }
         return origin;

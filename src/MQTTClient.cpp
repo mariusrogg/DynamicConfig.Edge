@@ -67,11 +67,11 @@ namespace ModelController
     //!
     //! @brief Get input/ouput mqtt variable, generate new if none found with given properties
     //!
-    BaseModule* MQTTClient::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType)
+    BaseModule* MQTTClient::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType, bool recursive)
     {
         Logger::trace("MQTTClient::GetChild(" + modulePath + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         BaseModule* child = nullptr;
-        child = BaseModule::GetChild(modulePath, type, dataType);
+        child = BaseModule::GetChild(modulePath, type, dataType, recursive);
         if (child == nullptr)
         {
             Logger::trace("No MQTT input/ouput matches parameters");

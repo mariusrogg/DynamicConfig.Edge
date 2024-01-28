@@ -79,9 +79,10 @@ namespace ModelController
             //! @param connectorPath Path of the child
             //! @param type ModuleType of the child
             //! @param dataType ModuleDataType of the child
+            //! @param recursive If set to false, child is returned, with which's name the modulePath starts
             //! @return BaseModule* Child, nullptr if not found
             //!
-            virtual BaseModule* GetChild(std::string connectorPath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined) override;
+            virtual BaseModule* GetChild(std::string connectorPath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined, bool recursive = false) override;
         public:
             //!
             //! @brief Name of the type for config

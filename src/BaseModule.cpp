@@ -192,6 +192,7 @@ namespace ModelController
     //!
     void BaseModule::Delete()
     {
+        Logger::debug("Deleting module " + GetPath());
         for (BaseModule* child : children)
         {
             child->Delete();
@@ -200,7 +201,7 @@ namespace ModelController
     //!
     //! @brief Returns child of the module
     //!
-    BaseModule* BaseModule::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType)
+    BaseModule* BaseModule::GetChild(std::string modulePath, ModuleType type, ModuleDataType dataType, bool recursive)
     {
         Logger::trace("BaseModule::GetChild(" + modulePath + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         Logger::trace("this->path: " + GetPath());
@@ -229,7 +230,7 @@ namespace ModelController
                 if (sizeName == sizePath || posSlash == sizeName)
                 {
                     //! @brief Check if size of path is longer than name -> searched element is grandchild
-                    if (sizePath >= sizeName + 1)
+                    if (sizePath >= sizeName + 1 && recursive)
                     {
                         std::string subPath = modulePath.substr(child->GetName().size() + 1);
                         Logger::trace("Sub path: " + subPath);
@@ -253,6 +254,31 @@ namespace ModelController
                     }
                 }
             }
+        }
+        return module;
+    }
+    //!
+    //! @brief Returns GetChild method without recursion
+    //!
+    BaseModule* BaseModule::GetDirectChild(std::string childPath)
+    {
+        return GetChild(childPath, ModuleType::eUndefined, ModuleDataType::eUndefined, false);
+    }
+    //!
+    //! @brief Returns this, if no child exists mathing to child path, else returns child
+    //!
+    BaseModule* BaseModule::GetFinalMatchingChild(std::string childPath)
+    {
+        Logger::trace("GetFinalMatchingChild(" + childPath + ")");
+        childPath = Utils::TrimStart(childPath, "/");
+        BaseModule* module = GetDirectChild(childPath);
+        if (module == nullptr)
+        {
+            module = this;
+        }
+        else
+        {
+            module = module->GetFinalMatchingChild(Utils::TrimStart(childPath, module->GetName(), 1));
         }
         return module;
     }
@@ -298,7 +324,7 @@ namespace ModelController
         Logger::trace("BaseModule::~BaseModule() - " + path);
         if (parent)
         {
-            remove(parent->children.begin(), parent->children.end(), this);
+            parent->children.erase(remove(parent->children.begin(), parent->children.end(), this), parent->children.end());
         }
     }
     //!
@@ -374,10 +400,58 @@ namespace ModelController
     //!
     void BaseModule::Delete(std::string path)
     {
+        Logger::trace("BaseModule::Delete(" + path + ")");
         if (BaseModule* module = GetModule<BaseModule>(path))
         {
             module->Delete();
         }
+    }
+    std::string BaseModule::Set(std::string path, std::string config)
+    {
+        Logger::trace("BaseModule::Set(" + path + ", " + config + ")");
+        std::string errorMessage = "";
+        JsonDocument configDoc;
+        ArduinoJson::DeserializationError error = deserializeJson(configDoc, config);
+
+        if (!error)
+        {
+            if (configDoc.is<JsonObject>())
+            {
+                // Remove '/' at beginning of the path
+                path = Utils::TrimStart(path, "/");
+                // Delete object at path (if exists)
+                Delete(path);
+                // Get parent of the module to be created
+                BaseModule* parent = GetFinalMatchingModule<BaseModule>(path);
+                // Path of the parent (without trailing slash)
+                std::string parentPath = Utils::TrimStart(parent->GetPath(), "/");
+                // Name of the child
+                std::string childName = Utils::TrimStart(path, parentPath);
+                // Delete children, which will be children of created module
+                for (std::vector<BaseModule*>::reverse_iterator it = parent->children.rbegin(); it != parent->children.rend(); it++)
+                {
+                    if (Utils::StartsWith((*it)->GetName(), childName))
+                    {
+                        (*it)->Delete();
+                    }
+                }
+                // ToDo: Set config for ConfigItems and other not BaseContainer stuff
+                // Set config to config doc (for persistence)
+                ConfigFile::SetConfig(path, configDoc.as<JsonObject>());
+                BaseModule::GenerateModule(childName, configDoc.as<JsonObject>(), parent);
+            }
+            else
+            {
+                errorMessage = "NoObjectType";
+            }
+        }
+        else
+        {
+            errorMessage = error.c_str();
+        }
+
+
+        return errorMessage;
     }
     //!
     //! @brief Update config of the controller

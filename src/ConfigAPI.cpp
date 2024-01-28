@@ -6,6 +6,7 @@
 //! @copyright Copyright (c) 2024
 //!
 #include "ConfigAPI.hpp"
+#include "Logger.hpp"
 
 namespace ModelController
 {
@@ -26,23 +27,17 @@ namespace ModelController
     //!
     std::string ConfigAPI::GetPathFromArgs()
     {
-        std::string path = "";
-        for (int i = 0; i < server.args() && path.empty(); i++)
-        {
-            if (server.argName(i) == "path")
-            {
-                path = server.arg(i).c_str();
-            }
-        }
-        return path;
+        return server.arg("path").c_str();
     }
     //!
     //! @brief Send parameters on specified path
     //!
     void ConfigAPI::handleGetParameters()
     {
+        std::string path = GetPathFromArgs();
+        Logger::debug("ConfigAPI: Received GetParameters for path " + path);
         std::string message;
-        message = ModelController::ConfigFile::GetConfig(GetPathFromArgs()).as<std::string>();
+        message = ModelController::ConfigFile::GetConfig(path).as<std::string>();
         // ToDo: Maybe handle this later via BaseModule::GetParameters (or similary)
         server.send(200, "text/json", message.c_str());
     }
@@ -51,8 +46,28 @@ namespace ModelController
     //!
     void ConfigAPI::handleDelete()
     {
-        BaseModule::Delete(GetPathFromArgs());
+        std::string path = GetPathFromArgs();
+        Logger::debug("ConfigAPI: Received Delete for path " + path);
+        BaseModule::Delete(path);
         server.send(200, "text/plain");
+    }
+    //!
+    //! @brief Set module on specified path
+    //!
+    void ConfigAPI::handleSet()
+    {
+        std::string path = GetPathFromArgs();
+        std::string content = server.arg("plain").c_str();
+        Logger::debug("ConfigAPI: Received Set for path " + path + " with content\n" + content);
+        std::string message = BaseModule::Set(path, content).c_str();
+        if (message.empty())
+        {
+            server.send(201);
+        }
+        else
+        {
+            server.send(400, "text/plain", message.c_str());
+        }
     }
     //!
     //! @brief Initialize routes
@@ -61,6 +76,7 @@ namespace ModelController
     {
         server.on("/Parameter", handleGetParameters);
         server.on("/Delete", HTTP_POST, handleDelete);
+        server.on("/Set", HTTP_POST, handleSet);
     }
     //!
     //! @brief Initialize server if not done yet, handle client requests and start server if not done yet or wifi disconnected

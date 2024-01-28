@@ -132,9 +132,25 @@ namespace ModelController
             //! @param modulePath Path of the child
             //! @param type ModuleType of the child
             //! @param dataType ModuleDataType of the child
+            //! @param recursive If set to false, child is returned, with which's name the modulePath starts
             //! @return BaseModule* Child, nullptr if not found
             //!
-            virtual BaseModule* GetChild(std::string modulePath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined);
+            virtual BaseModule* GetChild(std::string modulePath, ModuleType type = ModuleType::eUndefined, ModuleDataType dataType = ModuleDataType::eUndefined, bool recursive = true);
+            //!
+            //! @brief Get the direct child of the object depenging on the childPath
+            //!
+            //! @param childPath Path to a child/grandchild of the object
+            //! @return BaseModule* Child, nullptr if not found
+            //!
+            virtual BaseModule* GetDirectChild(std::string childPath);
+            //!
+            //! @brief Get the child with the longest path match from beginning of the childPath
+            //!        (Module with exact path or parent of module with path, if module not existing yet)
+            //!
+            //! @param childPath Path to child
+            //! @return BaseModule* Child with longest path match
+            //!
+            virtual BaseModule* GetFinalMatchingChild(std::string childPath);
         public:
             //!
             //! @brief Root module of the hardware configuration
@@ -206,6 +222,14 @@ namespace ModelController
             //!
             static void Delete(std::string path);
             //!
+            //! @brief Set module with path
+            //!
+            //! @param path Path to module to be set
+            //! @param config Config of the module to be set
+            //! @return std::string Error message, empty if no error occured
+            //!
+            static std::string Set(std::string path, std::string config);
+            //!
             //! @brief Get a module by path
             //!
             //! @param modulePath Path of the module
@@ -235,6 +259,24 @@ namespace ModelController
                     Logger::trace("Root module not created yet");
                 }
                 return rootModule == nullptr ? nullptr : rootModule->GetChildModule<T>(modulePath, type, dataType);
+            }
+            //!
+            //! @brief Get a module by path and get parent of path, if module is not existing
+            //!
+            //! @tparam T Class type of the module
+            //! @param modulePath Path of the module
+            //! @return T* BaseModule with path
+            //!
+            template<class T>
+            static T* GetFinalMatchingModule(std::string modulePath)
+            {
+                //! Remove "/" from beginning and end of the path
+                modulePath = Utils::Trim(modulePath, "/");
+                if (rootModule == nullptr)
+                {
+                    Logger::trace("Root module not created yet");
+                }
+                return rootModule == nullptr ? nullptr : rootModule->GetFinalMatchingChild(modulePath);
             }
             //!
             //! @brief Update hardware configuration

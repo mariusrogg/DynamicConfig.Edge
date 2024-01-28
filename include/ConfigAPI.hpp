@@ -48,6 +48,10 @@ namespace ModelController
             //!
             static void handleDelete();
             //!
+            //! @brief Handle POST request on path /Set
+            //!
+            static void handleSet();
+            //!
             //! @brief Initialize routes
             //!
             static void Initialize();

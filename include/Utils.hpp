@@ -24,17 +24,19 @@ namespace ModelController
             //!
             //! @param origin String to remove from
             //! @param trim String to be removed
+            //! @param repetition Maximum amount of times the string should be deleted (-1 for infinite)
             //! @return std::string Trimmed string
             //!
-            static std::string TrimStart(std::string origin, std::string trim);
+            static std::string TrimStart(std::string origin, std::string trim, int repetition = -1);
             //!
             //! @brief Trim (remove) all occurences of a string at the end of another string
             //!
             //! @param origin String to remove from
             //! @param trim String to be removed
+            //! @param repetition Maximum amount of times the string should be deleted (-1 for infinite)
             //! @return std::string Trimmed string
             //!
-            static std::string TrimEnd(std::string origin, std::string trim);
+            static std::string TrimEnd(std::string origin, std::string trim, int repetition = -1);
             //!
             //! @brief Trim (remove) all occurences of a string at the beginnging and end of another string
             //!
