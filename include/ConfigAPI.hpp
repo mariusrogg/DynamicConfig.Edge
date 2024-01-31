@@ -40,9 +40,19 @@ namespace ModelController
             //!
             static std::string GetPathFromArgs();
             //!
+            //! @brief Extract arg value out of args
+            //!
+            //! @return std::string Name of the argument
+            //!
+            static std::string GetFromArgs(std::string arg);
+            //!
             //! @brief Handle method to get parameters
             //!
             static void handleGetParameters();
+            //!
+            //! @brief Handle method to get containers
+            //!
+            static void handleGetContainers();
             //!
             //! @brief Handle POST request on path /Delete
             //!

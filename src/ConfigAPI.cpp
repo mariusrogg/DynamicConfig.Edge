@@ -27,7 +27,14 @@ namespace ModelController
     //!
     std::string ConfigAPI::GetPathFromArgs()
     {
-        return server.arg("path").c_str();
+        return GetFromArgs("path");
+    }
+    //!
+    //! @brief Iterate through args until arg with name path was found
+    //!
+    std::string ConfigAPI::GetFromArgs(std::string arg)
+    {
+        return server.arg(arg.c_str()).c_str();
     }
     //!
     //! @brief Send parameters on specified path
@@ -39,6 +46,25 @@ namespace ModelController
         std::string message;
         message = ModelController::ConfigFile::GetConfig(path).as<std::string>();
         // ToDo: Maybe handle this later via BaseModule::GetParameters (or similary)
+        server.send(200, "text/json", message.c_str());
+    }
+    //!
+    //! @brief Send parameters on specified path
+    //!
+    void ConfigAPI::handleGetContainers()
+    {
+        std::string path = GetPathFromArgs();
+        std::string type = GetFromArgs("type");
+        Logger::debug("ConfigAPI: Received GetContainers for path " + path + " with type '" + type + "'");
+        std::vector<std::string> containers = BaseModule::GetContainers(path, type);
+        JsonDocument doc;
+        JsonArray arr = doc.to<JsonArray>();
+        for (std::string container : containers)
+        {
+            arr.add(container);
+        }
+
+        std::string message = doc.as<std::string>();
         server.send(200, "text/json", message.c_str());
     }
     //!
@@ -75,6 +101,7 @@ namespace ModelController
     void ConfigAPI::Initialize()
     {
         server.on("/Parameter", handleGetParameters);
+        server.on("/Containers", handleGetContainers);
         server.on("/Delete", HTTP_POST, handleDelete);
         server.on("/Set", HTTP_POST, handleSet);
     }

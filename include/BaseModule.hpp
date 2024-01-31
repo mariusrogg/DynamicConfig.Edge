@@ -142,7 +142,7 @@ namespace ModelController
             //! @param childPath Path to a child/grandchild of the object
             //! @return BaseModule* Child, nullptr if not found
             //!
-            virtual BaseModule* GetDirectChild(std::string childPath);
+            BaseModule* GetDirectChild(std::string childPath);
             //!
             //! @brief Get the child with the longest path match from beginning of the childPath
             //!        (Module with exact path or parent of module with path, if module not existing yet)
@@ -150,7 +150,14 @@ namespace ModelController
             //! @param childPath Path to child
             //! @return BaseModule* Child with longest path match
             //!
-            virtual BaseModule* GetFinalMatchingChild(std::string childPath);
+            BaseModule* GetFinalMatchingChild(std::string childPath);
+            //!
+            //! @brief Get the containers with specified type
+            //!
+            //! @param type Type of the containers to get
+            //! @return std::vector<std::string> List with paths to all containers of type
+            //!
+            std::vector<std::string> GetContainers(std::string type);
         public:
             //!
             //! @brief Root module of the hardware configuration
@@ -254,11 +261,27 @@ namespace ModelController
             {
                 //! Remove "/" from beginning and end of the path
                 modulePath = Utils::Trim(modulePath, "/");
+                BaseModule* module = nullptr;
+                //! Return nullptr if rootModule is not initialized
                 if (rootModule == nullptr)
                 {
                     Logger::trace("Root module not created yet");
                 }
-                return rootModule == nullptr ? nullptr : rootModule->GetChildModule<T>(modulePath, type, dataType);
+                //! Return root module if path is emtpty (or was '/')
+                else if (modulePath.empty())
+                {
+                    if ((type == ModuleType::eUndefined || rootModule->GetType() == type)
+                            && (dataType == ModuleDataType::eUndefined || rootModule->GetDataType() == dataType))
+                    {
+                        module = rootModule;
+                    }
+                }
+                //! Return module with path and defined types in other cases
+                else
+                {
+                    module = rootModule->GetChildModule<T>(modulePath, type, dataType);
+                }
+                return dynamic_cast<T*>(module);
             }
             //!
             //! @brief Get a module by path and get parent of path, if module is not existing
@@ -278,6 +301,14 @@ namespace ModelController
                 }
                 return rootModule == nullptr ? nullptr : rootModule->GetFinalMatchingChild(modulePath);
             }
+            //!
+            //! @brief Get containers with specified type
+            //!
+            //! @param type Type of the searched containers
+            //! @param path Path of module to search from
+            //! @return std::vector<std::string> List with paths to all containers of type
+            //!
+            static std::vector<std::string> GetContainers(std::string path, std::string type);
             //!
             //! @brief Update hardware configuration
             //!
