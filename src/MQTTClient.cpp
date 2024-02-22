@@ -283,6 +283,6 @@ namespace ModelController
     bool MQTTClient::publish(std::string topic, std::string value)
     {
         Logger::trace("MQTT " + GetPath() + " publish " + value + " to " + topic);
-        return client.publish(topic.c_str(), value.c_str());
+        return client.publish(topic.c_str(), value.c_str(), true);
     }
 } // namespace ModelController
