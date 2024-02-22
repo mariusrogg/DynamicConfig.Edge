@@ -22,7 +22,7 @@ namespace ModelController
     //! @brief Construct a new ModuleOut object
     //!
     IModuleOut::IModuleOut(std::string name, BaseModule* parent, ModuleDataType dataType)
-        : BaseModule(name, parent, false, ModuleType::eOutput, dataType)
+        : BaseModule(name, parent, ModuleType::eOutput, dataType)
     {
     }
 } // namespace ModelController

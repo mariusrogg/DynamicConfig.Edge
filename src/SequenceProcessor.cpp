@@ -93,14 +93,14 @@ namespace ModelController
     SequenceProcessor::SequenceProcessor(std::string name, JsonObject config, BaseModule* parent)
         : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
         loopListener([&](){this->Execute();}),
-        out("out", config, this),
+        out("out", this),
         on(config["on"].is<std::string>() ? config["on"].as<std::string>() : "{}"),
         off(config["off"].is<std::string>() ? config["off"].as<std::string>() : "{}"),
         activate("activate", config, [&](bool value) { this->OnActivateChanged(value); }, this),
         manualTarget("manualTarget", config, [&](double value) { this->OnManualTargetChanged(value); }, this),
         targetMode("targetMode", config, [&](std::string value) { this->OnTargetModeChanged(value); }, this),
         defaultMode("defaultMode", config, "", this),
-        active("active", config, this)
+        active("active", this)
     {
         JsonObject jsonModes = config["modes"].as<JsonObject>();
         for (JsonObject::iterator it = jsonModes.begin(); it != jsonModes.end(); ++it)

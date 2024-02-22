@@ -23,6 +23,10 @@ namespace ModelController
     //!
     std::string BaseModule::apiPath = "/Connectors/mqtt";
     //!
+    //! @brief Name of the controller
+    //!
+    std::string BaseModule::edgeName = "undefined";
+    //!
     //! @brief Root module
     //!
     BaseModule* BaseModule::rootModule = nullptr;
@@ -332,7 +336,7 @@ namespace ModelController
     //!
     //! @brief Construct a new Module object
     //!
-    BaseModule::BaseModule(std::string name, BaseModule* parent, bool createShortPath, ModuleType type, ModuleDataType dataType)
+    BaseModule::BaseModule(std::string name, BaseModule* parent, ModuleType type, ModuleDataType dataType)
         : parent(parent),
         moduleType(type),
         moduleDataType(dataType)
@@ -340,14 +344,6 @@ namespace ModelController
         this->name = Utils::Trim(name, "/");
         this->path = (this->parent != nullptr ? Utils::TrimEnd(this->parent->path, "/") : "") + "/" + this->name;
         Logger::trace("BaseModule::BaseModule(" + name + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        if (createShortPath)
-        {
-            this->shortPath = "/" + this->name;
-        }
-        else
-        {
-            this->shortPath = (this->parent != nullptr ? this->parent->shortPath : "") + "/" + this->name;
-        }
         if (this->parent)
         {
             this->parent->children.push_back(this);
@@ -358,7 +354,7 @@ namespace ModelController
     //! @brief Construct a new Module object
     //!
     BaseModule::BaseModule(std::string name, JsonObject config, BaseModule* parent, ModuleType type, ModuleDataType dataType)
-        : BaseModule(name, parent, config["shortPath"].is<bool>() ? config["shortPath"].as<bool>() : false, type, dataType)
+        : BaseModule(name, parent, type, dataType)
     {
         Logger::trace("BaseModule::BaseModule(" + name + ", json-config, " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
         SetConfig(config);
@@ -427,13 +423,6 @@ namespace ModelController
     std::string BaseModule::GetPath() const
     {
         return path;
-    }
-    //!
-    //! @brief Returns short path of the actual object
-    //!
-    std::string BaseModule::GetShortPath() const
-    {
-        return shortPath;
     }
     //!
     //! @brief Returns name of the actual object
@@ -553,6 +542,24 @@ namespace ModelController
 
         WiFiHandler::SetSSIDPassword(config["wifi"]["ssid"], config["wifi"]["password"]);
 
+        if (!config["APIPath"].is<std::string>())
+        {
+            config["APIPath"] = apiPath;
+        }
+        else
+        {
+            apiPath = config["APIPath"].as<std::string>();
+        }
+
+        if (!config["name"].is<std::string>())
+        {
+            config["name"] = edgeName;
+        }
+        else
+        {
+            edgeName = config["name"].as<std::string>();
+        }
+
 
         if (rootModule != nullptr)
         {
@@ -563,14 +570,6 @@ namespace ModelController
         rootModule = new BaseModule("");
         rootModule->SetConfig(config);
 
-        if (!config["APIPath"].is<std::string>())
-        {
-            config["APIPath"] = apiPath;
-        }
-        else
-        {
-            apiPath = config["APIPath"].as<std::string>();
-        }
     }
     //!
     //! @brief Get config of the connector and it's children

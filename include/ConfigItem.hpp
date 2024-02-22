@@ -44,7 +44,7 @@ namespace ModelController
             //! @param parent Parent of the config item
             //!
             ConfigItem(std::string name, JsonObject parentConfig, T defaultValue, BaseModule* parent = nullptr)
-                : BaseModule(name, parent, false, ModuleType::eNone, GetDataTypeById(typeid(T))),
+                : BaseModule(name, parent, ModuleType::eNone, GetDataTypeById(typeid(T))),
                 value(defaultValue),
                 defaultValue(defaultValue)
             {

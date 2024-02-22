@@ -22,7 +22,7 @@ namespace ModelController
     //! @brief Construct a new ModuleIn object
     //!
     IModuleIn::IModuleIn(std::string name, BaseModule* parent, ModuleDataType dataType)
-        : BaseModule(name, parent, false, ModuleType::eInput, dataType)
+        : BaseModule(name, parent, ModuleType::eInput, dataType)
     {
     }
 } // namespace ModelController

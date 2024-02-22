@@ -22,7 +22,7 @@ namespace ModelController
     Gain::Gain(std::string name, JsonObject config, BaseModule* parent)
             : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eDouble),
             in("in", config, [&](double value) { calculateOut(value); }, this),
-            out("out", config, this),
+            out("out", this),
             gain("gain", config, 1, this)
         {
         }

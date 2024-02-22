@@ -147,10 +147,9 @@ namespace ModelController
                 {
                     OnOutputCreated(this->pathConnectedModuleOut);
                 }
-                ModuleInCreated(this->GetPath());
                 if (this->pathConnectedModuleOut.empty() && !Utils::StartsWith(GetPath(), apiPath))
                 {
-                    this->pathConnectedModuleOut = apiPath + GetShortPath();
+                    this->pathConnectedModuleOut = apiPath + GetPath();
                     Logger::trace("Creating connection to default connector for " + this->GetPath());
                     this->OnOutputCreated(this->pathConnectedModuleOut);
                 }

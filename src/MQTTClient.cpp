@@ -62,6 +62,8 @@ namespace ModelController
     //!
     bool MQTTClient::subscribe(std::string topic)
     {
+        topic = "/" + edgeName + topic;
+        Logger::debug("Subscribing to " + topic);
         return client.subscribe(topic.c_str());
     }
     //!
@@ -253,7 +255,7 @@ namespace ModelController
                 {
                     // ToDo: Delete from input variables, if destructor called (idea: via events)
                     Logger::debug("Add MQTT input variable /" + mqttInput->GetName() + " to inputVariables and subscribe");
-                    mqttInputVariables["/" + mqttInput->GetName()] = mqttInput;
+                    mqttInputVariables["/" + edgeName + "/" + mqttInput->GetName()] = mqttInput;
                     subscribe("/" + mqttInput->GetName());
                 }
             }
@@ -283,6 +285,6 @@ namespace ModelController
     bool MQTTClient::publish(std::string topic, std::string value)
     {
         Logger::trace("MQTT " + GetPath() + " publish " + value + " to " + topic);
-        return client.publish(topic.c_str(), value.c_str(), true);
+        return client.publish(("/" + edgeName + topic).c_str(), value.c_str(), true);
     }
 } // namespace ModelController
