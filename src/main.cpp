@@ -29,10 +29,10 @@ void setup()
 int i = 0;
 void loop()
 {
-    Logger::debug("start loop");
+    Logger::trace("start loop");
 
     ModelController::LoopEvent::Raise();
     ModelController::ConfigAPI::Handle(WiFiHandler::Check());
 
-    Logger::debug("end loop");
+    Logger::trace("end loop");
 }

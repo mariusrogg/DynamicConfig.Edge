@@ -10,7 +10,7 @@
 #include "EventHandling.hpp"
 
 namespace ModelController
-{
+{ // ToDo: inform out on deletion and other way round
     class IModuleIn : public BaseModule
     {
         public:

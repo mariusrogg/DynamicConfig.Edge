@@ -105,7 +105,7 @@ namespace ModelController
             //!
             //! @brief True if mode is active
             //!
-            bool active = true;
+            ModuleOut<bool> active;
             //!
             //! @brief True if mode should be active in next cycle
             //!

@@ -194,6 +194,15 @@ namespace ModelController
                 }
             }
             //!
+            //! @brief Assignment operator to set value
+            //!
+            //! @param value Value to be set
+            //!
+            void operator=(T value)
+            {
+                SetValue(value);
+            }
+            //!
             //! @brief Set incoming string value, convert to T and set to variable
             //!
             //! @param value value to be set to variable
@@ -210,6 +219,15 @@ namespace ModelController
             T GetValue() const
             {
                 return actualValue;
+            }
+            //!
+            //! @brief Operator T to return value
+            //!
+            //! @return T Value of the item
+            //!
+            operator T()
+            {
+                return GetValue();
             }
             //!
             //! @brief Get the module output by path
