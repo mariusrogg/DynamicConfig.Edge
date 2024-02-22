@@ -147,9 +147,9 @@ namespace ModelController
                 }
                 Logger::trace("Raising ModuleOutCreated(" + this->GetPath() + ")");
                 ModuleOutCreated(this->GetPath());
-                if (this->pathConnectedModuleIn.empty() && !Utils::StartsWith(GetPath(), "/Connectors/mqtt"))
+                if (this->pathConnectedModuleIn.empty() && !Utils::StartsWith(GetPath(), apiPath))
                 {
-                    this->pathConnectedModuleIn = "/Connectors/mqtt" + GetShortPath();
+                    this->pathConnectedModuleIn = apiPath + GetShortPath();
                     Logger::trace("Creating connection to default connector for " + this->GetShortPath());
                     this->OnInputCreated(this->pathConnectedModuleIn);
                 }

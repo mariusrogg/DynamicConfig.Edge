@@ -81,6 +81,10 @@ namespace ModelController
             //! @return ModuleDataType DataType of the object
             //!
             ModuleDataType GetDataType() const;
+            //!
+            //! @brief Path to api (eg. mqtt)
+            //!
+            static std::string apiPath;
         private:
             //!
             //! @brief Parent of the module object
@@ -102,10 +106,6 @@ namespace ModelController
             //! @brief Name of the module object
             //!
             std::string name;
-            //!
-            //! @brief Default config file path
-            //!
-            static std::string configFilePath;
 
         protected:
             //!

@@ -19,6 +19,10 @@
 namespace ModelController
 {
     //!
+    //! @brief Path to the api
+    //!
+    std::string BaseModule::apiPath = "/Connectors/mqtt";
+    //!
     //! @brief Root module
     //!
     BaseModule* BaseModule::rootModule = nullptr;
@@ -559,6 +563,14 @@ namespace ModelController
         rootModule = new BaseModule("");
         rootModule->SetConfig(config);
 
+        if (!config["APIPath"].is<std::string>())
+        {
+            config["APIPath"] = apiPath;
+        }
+        else
+        {
+            apiPath = config["APIPath"].as<std::string>();
+        }
     }
     //!
     //! @brief Get config of the connector and it's children
