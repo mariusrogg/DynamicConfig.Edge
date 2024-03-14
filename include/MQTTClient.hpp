@@ -92,10 +92,9 @@ namespace ModelController
             //! @brief Construct a new MQTTClient object
             //!
             //! @param name Name of the MQTTClient connection
-            //! @param config Config of the connection
             //! @param parent Parent of the MQTTClient-Connection (normally pass this)
             //!
-            MQTTClient(std::string name, JsonObject config, BaseModule* parent = nullptr);
+            MQTTClient(std::string name, BaseModule* parent = nullptr);
             //!
             //! @brief Publish topic to mqtt broker
             //!

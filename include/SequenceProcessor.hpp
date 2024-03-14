@@ -135,10 +135,9 @@ namespace ModelController
             //! @brief Construct a new Sequence Processor object
             //!
             //! @param name Name of the processor
-            //! @param config Config of the processor
             //! @param parent Parent of the Processor (normally pass this)
             //!
-            SequenceProcessor(std::string name, JsonObject config, BaseModule* parent = nullptr);
+            SequenceProcessor(std::string name, BaseModule* parent = nullptr);
             //!
             //! @brief Destruction of the Sequence Processor object
             //!

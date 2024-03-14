@@ -17,6 +17,9 @@ namespace ModelController
     class OnboardPWM : public BaseContainer
     {
     private:
+        //!
+        //! @brief Input to set target value for pwm output
+        //!
         ModuleIn<double> in;
         //!
         //! @brief PWM-Channels already used by the program
@@ -75,10 +78,9 @@ namespace ModelController
         //! @brief Construct a new PWMChannel object
         //!
         //! @param name Name of the connector
-        //! @param config Config of the connector
         //! @param parent Parent of the Connector (normally pass this)
         //!
-        OnboardPWM(std::string name, JsonObject config, BaseModule* parent = nullptr);
+        OnboardPWM(std::string name, BaseModule* parent = nullptr);
         //!
         //! @brief Destroy the PWMChannel object
         //!

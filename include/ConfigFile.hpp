@@ -12,6 +12,7 @@
 #include <ArduinoJson.h>
 #include "EventHandling.hpp"
 #include "Utils.hpp"
+#include <optional>
 
 namespace ModelController
 {
@@ -62,6 +63,20 @@ namespace ModelController
             //! @return JsonVariant Element at specified path
             //!
             static JsonVariant GetConfig(std::string path, bool create = false);
+            //!
+            //! @brief Get the config at a specified path
+            //!
+            //! @tparam T Type of the value
+            //! @param path Path to get config from
+            //! @param create If true, element with path is created, if not yet existing
+            //! @return T Element at specified path
+            //!
+            template<typename T>
+            static std::optional<T> GetConfig(std::string path, bool create = false)
+            {
+                JsonVariant config = GetConfig(path, create);
+                return config.is<T>() ? std::optional<T>{config.as<T>()} : std::nullopt;
+            }
             //!
             //! @brief Set a value to the config
             //!

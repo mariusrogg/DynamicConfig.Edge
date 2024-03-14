@@ -117,11 +117,9 @@ namespace ModelController
             //!
             ModuleDataType moduleDataType = ModuleDataType::eUndefined;
             //!
-            //! @brief Set the config to the module
+            //! @brief Set the config from file to the module
             //!
-            //! @param config Config to be set
-            //!
-            virtual void SetConfig(JsonObject config);
+            virtual void SetConfig();
             //!
             //! @brief Delete object, if possible
             //!
@@ -167,16 +165,6 @@ namespace ModelController
             //! @brief Construct a new module object
             //!
             //! @param name Name of the module
-            //! @param config Config of the module
-            //! @param parent Parent of the module (normally pass this)
-            //! @param type Type of the module
-            //! @param dataType DataType of the module
-            //!
-            BaseModule(std::string name, JsonObject config, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
-            //!
-            //! @brief Construct a new module object
-            //!
-            //! @param name Name of the module
             //! @param parent Parent of the module (normally pass this)
             //! @param type Type of the module
             //! @param dataType DataType of the module
@@ -187,12 +175,13 @@ namespace ModelController
             //!
             virtual ~BaseModule();
             //!
-            //! @brief Generate module from json
+            //! @brief Generate module from config-file
             //!
-            //! @param moduleConfig Config of the module
+            //! @param name Name of the module
+            //! @param parent Parent of the module (normally pass this)
             //! @return BaseModule* Created module
             //!
-            static BaseModule* GenerateModule(std::string name, JsonObject moduleConfig, BaseModule* parent = nullptr);
+            static BaseModule* GenerateModule(std::string name, BaseModule* parent = nullptr);
             //!
             //! @brief Default config file path
             //!

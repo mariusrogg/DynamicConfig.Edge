@@ -92,62 +92,62 @@ namespace ModelController
                         break;
                     case ModuleDataType::eDouble:
                         {
-                            child = new ModuleIn<double>(modulePath, pubFn, this);
+                            child = ModuleIn<double>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eFloat:
                         {
-                            child = new ModuleIn<float>(modulePath, pubFn, this);
+                            child = ModuleIn<float>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eString:
                         {
-                            child = new ModuleIn<std::string>(modulePath, pubFn, this);
+                            child = ModuleIn<std::string>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt8:
                         {
-                            child = new ModuleIn<int8_t>(modulePath, pubFn, this);
+                            child = ModuleIn<int8_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt16:
                         {
-                            child = new ModuleIn<int16_t>(modulePath, pubFn, this);
+                            child = ModuleIn<int16_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt32:
                         {
-                            child = new ModuleIn<int32_t>(modulePath, pubFn, this);
+                            child = ModuleIn<int32_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eInt64:
                         {
-                            child = new ModuleIn<int64_t>(modulePath, pubFn, this);
+                            child = ModuleIn<int64_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt8:
                         {
-                            child = new ModuleIn<uint8_t>(modulePath, pubFn, this);
+                            child = ModuleIn<uint8_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt16:
                         {
-                            child = new ModuleIn<uint16_t>(modulePath, pubFn, this);
+                            child = ModuleIn<uint16_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt32:
                         {
-                            child = new ModuleIn<uint32_t>(modulePath, pubFn, this);
+                            child = ModuleIn<uint32_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eUInt64:
                         {
-                            child = new ModuleIn<uint64_t>(modulePath, pubFn, this);
+                            child = ModuleIn<uint64_t>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     case ModuleDataType::eBool:
                         {
-                            child = new ModuleIn<bool>(modulePath, pubFn, this);
+                            child = ModuleIn<bool>::GenerateModuleIn(modulePath, pubFn, this);
                         }
                         break;
                     default:
@@ -265,14 +265,14 @@ namespace ModelController
     //!
     //! @brief Construct a new MQTTClient::MQTTClient object
     //!
-    MQTTClient::MQTTClient(std::string name, JsonObject config, BaseModule* parent)
-        : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
+    MQTTClient::MQTTClient(std::string name, BaseModule* parent)
+        : BaseContainer(name, parent, ModuleType::eNone, ModuleDataType::eNone),
         client(wifiClient),
         OnSTAConnected(&WiFiHandler::STAConnected, [&](){reconnect();}),
         loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0),
-        serverHostname("server", config, "raspberrypi", this),
-        serverPort("port", config, 1883, this),
-        clientID("clientID", config, "ESP32-" + Utils::GetRandomNumber(18), this)
+        serverHostname("server", "raspberrypi", this),
+        serverPort("port", 1883, this),
+        clientID("clientID", "ESP32-" + Utils::GetRandomNumber(18), this)
     {
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
 

@@ -16,43 +16,65 @@
         {
             "pin": [4],
             "type": "pwm",
-            "in": "/Processors/Taxi/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/Taxi/out"
+            }
+                
         },
         "PWM_1":
         {
             "pin": [5],
             "type": "pwm",
-            "in": "/Processors/Takeoff/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/Takeoff/out"
+            }
         },
         "PWM_2":
         {
             "pin": [16, 17],
             "type": "pwm",
-            "in": "/Processors/WingPosition/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/WingPosition/out"
+            }
         },
         "PWM_3":
         {
             "pin": [18, 19],
             "type": "pwm",
-            "in": "/Processors/Beacon/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/Beacon/out"
+            }
         },
         "PWM_4":
         {
             "pin": [21, 22],
             "type": "pwm",
-            "in": "/Processors/WingStrobe/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/WingStrobe/out"
+            }
         },
         "PWM_5":
         {
             "pin": [23, 25],
             "type": "pwm",
-            "in": "/Processors/Logo/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/Logo/out"
+            }
         },
         "PWM_6":
         {
             "pin": [26],
             "type": "pwm",
-            "in": "/Processors/TailStrobe/out"
+            "in": 
+            {
+                "connectedOut": "/Processors/TailStrobe/out"
+            }
         },
         "i2c0":
         {

@@ -183,17 +183,20 @@ namespace ModelController
     //!
     //! @brief Set config to object and generate submodules
     //!
-    void BaseModule::SetConfig(JsonObject config)
+    void BaseModule::SetConfig()
     {
-        Logger::trace(GetPath() + "\t Config: " + ((JsonVariant)config).as<std::string>());
-        for (JsonPair child : config)
+        std::optional<JsonObject> config = ConfigFile::GetConfig<JsonObject>(GetPath());
+        if (config)
         {
-            if (child.value().is<JsonObject>())
+            for (JsonPair child : config.value())
             {
-                Logger::trace("Child found in json: " + std::string(child.key().c_str()));
-                GenerateModule(child.key().c_str(), child.value(), this);
+                if (child.value().is<JsonObject>())
+                {
+                    Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                    GenerateModule(child.key().c_str(), this);
+                }
             }
-        }
+        }        
     }
     //!
     //! @brief Delete children of the current module
@@ -349,15 +352,7 @@ namespace ModelController
             this->parent->children.push_back(this);
             Logger::debug("Added " + GetPath() + " to children of " + parent->GetPath());
         }
-    }
-    //!
-    //! @brief Construct a new Module object
-    //!
-    BaseModule::BaseModule(std::string name, JsonObject config, BaseModule* parent, ModuleType type, ModuleDataType dataType)
-        : BaseModule(name, parent, type, dataType)
-    {
-        Logger::trace("BaseModule::BaseModule(" + name + ", json-config, " + (parent == nullptr ? "NULL" : parent->GetPath()) + ", " + TypeToString(type) + ", " + DataTypeToString(dataType) + ")");
-        SetConfig(config);
+        SetConfig();
     }
     //!
     //! @brief Destruction the module object
@@ -373,38 +368,43 @@ namespace ModelController
     //!
     //! @brief Generates module from json
     //!
-    BaseModule* BaseModule::GenerateModule(std::string name, JsonObject moduleConfig, BaseModule* parent)
+    BaseModule* BaseModule::GenerateModule(std::string name, BaseModule* parent)
     {
         Logger::trace("BaseModule::GenerateModule(" + name + ", " + "json-config" + ", " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
+        std::optional<JsonObject> config = ConfigFile::GetConfig<JsonObject>(parent->GetPath() + "/" + name);
         BaseModule* module = nullptr;
-        if (moduleConfig["type"].is<std::string>())
+        if (config)
         {
-            std::string type = moduleConfig["type"].as<std::string>();
-            if (type == Gain::type)
+            JsonObject moduleConfig = config.value();
+            if (moduleConfig["type"].is<std::string>())
             {
-                module = new Gain(name, moduleConfig, parent);
-            }
-            else if (type == SequenceProcessor::type)
-            {
-                module = new SequenceProcessor(name, moduleConfig, parent);
-            }
-            else if (type == OnboardPWM::type)
-            {
-                module = new OnboardPWM(name, moduleConfig, parent);
-            }
-            else if (type == MQTTClient::type)
-            {
-                module = new MQTTClient(name, moduleConfig, parent);
-            }
-        }
-        if (module == nullptr)
-        {
-            for (JsonPair child : moduleConfig)
-            {
-                if (child.value().is<JsonObject>())
+                std::string type = moduleConfig["type"].as<std::string>();
+                if (type == Gain::type)
                 {
-                    Logger::trace("Child found in json: " + std::string(child.key().c_str()));
-                    GenerateModule(name + "/" + child.key().c_str(), child.value(), parent);
+                    module = new Gain(name, parent);
+                }
+                else if (type == SequenceProcessor::type)
+                {
+                    module = new SequenceProcessor(name, parent);
+                }
+                else if (type == OnboardPWM::type)
+                {
+                    module = new OnboardPWM(name, parent);
+                }
+                else if (type == MQTTClient::type)
+                {
+                    module = new MQTTClient(name, parent);
+                }
+            }
+            if (module == nullptr)
+            {
+                for (JsonPair child : moduleConfig)
+                {
+                    if (child.value().is<JsonObject>())
+                    {
+                        Logger::trace("Child found in json: " + std::string(child.key().c_str()));
+                        GenerateModule(name + "/" + child.key().c_str(), parent);
+                    }
                 }
             }
         }
@@ -442,6 +442,9 @@ namespace ModelController
             module->Delete();
         }
     }
+    //!
+    //! @brief Set config to module at path
+    //!
     std::string BaseModule::Set(std::string path, std::string config)
     {
         Logger::trace("BaseModule::Set(" + path + ", " + config + ")");
@@ -474,7 +477,7 @@ namespace ModelController
                 // ToDo: Set config for ConfigItems and other not BaseContainer stuff
                 // Set config to config doc (for persistence)
                 ConfigFile::SetConfig(path, configDoc.as<JsonObject>());
-                BaseModule::GenerateModule(childName, configDoc.as<JsonObject>(), parent);
+                BaseModule::GenerateModule(childName, parent);
             }
             else
             {
@@ -485,8 +488,6 @@ namespace ModelController
         {
             errorMessage = error.c_str();
         }
-
-
         return errorMessage;
     }
     //!
@@ -568,7 +569,7 @@ namespace ModelController
             Logger::trace("Deleted old rootModule");
         }
         rootModule = new BaseModule("");
-        rootModule->SetConfig(config);
+        rootModule->SetConfig();
 
     }
     //!

@@ -45,10 +45,9 @@ namespace ModelController
             //! @brief Construct a new Gain object
             //!
             //! @param name Name of the gain
-            //! @param config Config
             //! @param parent Parent module
             //!
-            Gain(std::string name, JsonObject config, BaseModule* parent = nullptr);
+            Gain(std::string name, BaseModule* parent = nullptr);
     };
 
 } // namespace ModelController

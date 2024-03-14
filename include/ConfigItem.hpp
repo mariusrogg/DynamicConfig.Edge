@@ -30,8 +30,7 @@ namespace ModelController
             //!
             virtual void Delete() override
             {
-                value = defaultValue;
-                ConfigFile::SetConfig(GetPath(), value);
+                SetValue(defaultValue);
             }
 
         public:
@@ -43,16 +42,13 @@ namespace ModelController
             //! @param defaultValue Default value, to be set to config item, if no value is found in config
             //! @param parent Parent of the config item
             //!
-            ConfigItem(std::string name, JsonObject parentConfig, T defaultValue, BaseModule* parent = nullptr)
+            ConfigItem(std::string name, T defaultValue, BaseModule* parent = nullptr)
                 : BaseModule(name, parent, ModuleType::eNone, GetDataTypeById(typeid(T))),
                 value(defaultValue),
                 defaultValue(defaultValue)
             {
-                // ToDo: names with '/'
-                if (parentConfig[name].is<T>())
-                {
-                    SetValue(parentConfig[name].as<T>());
-                }
+                // Set value from config
+                SetValue(ConfigFile::GetConfig<T>(GetPath()).value_or(this->defaultValue));
             }
             //!
             //! @brief Set the value of the config item
@@ -62,7 +58,14 @@ namespace ModelController
             void SetValue(T value)
             {
                 this->value = value;
-                ConfigFile::SetConfig(GetPath(), value);
+                if (this->value != defaultValue)
+                {
+                    ConfigFile::SetConfig(GetPath(), value);
+                }
+                else
+                {
+                    ConfigFile::Remove(GetPath());
+                }
             }
             //!
             //! @brief Get the value of the config item

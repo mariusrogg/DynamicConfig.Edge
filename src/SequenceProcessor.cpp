@@ -90,24 +90,28 @@ namespace ModelController
     //!
     //! @brief Initializing modes, sequences, ... by json
     //!
-    SequenceProcessor::SequenceProcessor(std::string name, JsonObject config, BaseModule* parent)
-        : BaseContainer(name, config, parent, ModuleType::eNone, ModuleDataType::eNone),
+    SequenceProcessor::SequenceProcessor(std::string name, BaseModule* parent)
+        : BaseContainer(name, parent, ModuleType::eNone, ModuleDataType::eNone),
         loopListener([&](){this->Execute();}),
         out("out", this),
-        on(config["on"].is<std::string>() ? config["on"].as<std::string>() : "{}"),
-        off(config["off"].is<std::string>() ? config["off"].as<std::string>() : "{}"),
-        activate("activate", config, [&](bool value) { this->OnActivateChanged(value); }, this),
-        manualTarget("manualTarget", config, [&](double value) { this->OnManualTargetChanged(value); }, this),
-        targetMode("targetMode", config, [&](std::string value) { this->OnTargetModeChanged(value); }, this),
-        defaultMode("defaultMode", config, "", this),
+        on(ConfigFile::GetConfig<std::string>(GetPath() + "/on").value_or("{}")),   // ToDo: Sequence and modes as BaseModule
+        off(ConfigFile::GetConfig<std::string>(GetPath() + "/off").value_or("{}")), // ToDo: Sequence and modes as BaseModule
+        activate("activate", [&](bool value) { this->OnActivateChanged(value); }, this),
+        manualTarget("manualTarget", [&](double value) { this->OnManualTargetChanged(value); }, this),
+        targetMode("targetMode", [&](std::string value) { this->OnTargetModeChanged(value); }, this),
+        defaultMode("defaultMode", "", this),
         active("active", this)
     {
-        JsonObject jsonModes = config["modes"].as<JsonObject>();
-        for (JsonObject::iterator it = jsonModes.begin(); it != jsonModes.end(); ++it)
+        std::optional<JsonObject> optModes = ConfigFile::GetConfig<JsonObject>(GetPath() + "/modes");   // ToDo: Is nullptr correct?
+        if (optModes)
         {
-            if (it->value().is<JsonObject>())
+            JsonObject jsonModes = optModes.value();
+            for (JsonObject::iterator it = jsonModes.begin(); it != jsonModes.end(); ++it)
             {
-                modes[it->key().c_str()] = new SequenceMode(it->value().as<JsonObject>());
+                if (it->value().is<JsonObject>())
+                {
+                    modes[it->key().c_str()] = new SequenceMode(it->value().as<JsonObject>());
+                }
             }
         }
         activeMode = GetMode(defaultMode);

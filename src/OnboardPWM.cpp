@@ -69,11 +69,11 @@ namespace ModelController
     //!
     //! @brief Construct a new Onboard PWM object
     //!
-    OnboardPWM::OnboardPWM(std::string name, JsonObject config, BaseModule* parent)
-        : BaseContainer(name, config, parent),
-        in("in", config, [&](double value) { this->SetValue(value); }, this),
-        resolution("resolution", config, 16, this),
-        frequency("frequency", config, 500, this)
+    OnboardPWM::OnboardPWM(std::string name, BaseModule* parent)
+        : BaseContainer(name, parent),
+        in("in", [&](double value) { this->SetValue(value); }, this),
+        resolution("resolution", 16, this),
+        frequency("frequency", 500, this)
     {
         Logger::trace("OnboardPWM::OnboardPWM(" + name + ", jsonConfig,  " + (parent == nullptr ? "NULL" : parent->GetPath()) + ")");
 
@@ -82,10 +82,10 @@ namespace ModelController
         {
             usedChannels.push_back(channel);
         }
-        JsonVariant jPins = config["pin"];
-        if (jPins.is<JsonArray>())
+        std::optional<JsonArray> optPins = ConfigFile::GetConfig<JsonArray>(GetPath() + "/pin");
+        if (optPins)
         {
-            JsonArray pins = jPins.as<JsonArray>();
+            JsonArray pins = optPins.value();
             for (JsonArray::iterator it = pins.begin(); it != pins.end(); ++it)
             {
                 if (it->is<uint8_t>())
