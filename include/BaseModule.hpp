@@ -185,7 +185,7 @@ namespace ModelController
             //!
             //! @brief Default config file path
             //!
-            static constexpr const char* defaultConfigFile = "/SmallConfig.json";
+            static constexpr const char* defaultConfigFile = "/Config.json";
             //!
             //! @brief Get the Parent of the object
             //!

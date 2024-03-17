@@ -7,93 +7,49 @@
 //!
 #pragma once
 
-#include "BaseModule.hpp"
-#include "ConfigFile.hpp"
+#include "IConfigItem.hpp"
 
 namespace ModelController
 {
     template <typename T>
-    class ConfigItem : public BaseModule
+    class ConfigItem : public IConfigItem<T>
     {
-        private:
-            //!
-            //! @brief Actual value of the config item
-            //!
-            T value;
-            //!
-            //! @brief Default value of the config item
-            //!
-            T defaultValue;
-        protected:
-            //!
-            //! @brief Delete ConfigItem (reset to default)
-            //!
-            virtual void Delete() override
-            {
-                SetValue(defaultValue);
-            }
-
         public:
             //!
             //! @brief Construct a new Config Item object
             //!
             //! @param name Name of the config item
-            //! @param parentConfig Parent config (where config items value is stored in)
             //! @param defaultValue Default value, to be set to config item, if no value is found in config
             //! @param parent Parent of the config item
+            //! @param deleteOnDefault True if config value is deleted, if set to default
             //!
-            ConfigItem(std::string name, T defaultValue, BaseModule* parent = nullptr)
-                : BaseModule(name, parent, ModuleType::eNone, GetDataTypeById(typeid(T))),
-                value(defaultValue),
-                defaultValue(defaultValue)
+            ConfigItem(std::string name, T defaultValue, BaseModule* parent = nullptr, bool deleteOnDefault = false)
+                : IConfigItem<T>(name, defaultValue, parent, deleteOnDefault)
             {
                 // Set value from config
-                SetValue(ConfigFile::GetConfig<T>(GetPath()).value_or(this->defaultValue));
+                SetValue(ConfigFile::GetConfig<T>(this->GetPath()).value_or(this->defaultValue));
             }
             //!
             //! @brief Set the value of the config item
             //!
             //! @param value New config value
             //!
-            void SetValue(T value)
+            virtual void SetValue(T value) override
             {
                 this->value = value;
-                if (this->value != defaultValue)
+                if (this->value == this->defaultValue && this->deleteOnDefault)
                 {
-                    ConfigFile::SetConfig(GetPath(), value);
+                    ConfigFile::Remove(this->GetPath());
                 }
                 else
                 {
-                    ConfigFile::Remove(GetPath());
+                    ConfigFile::SetConfig(this->GetPath(), value);
                 }
             }
             //!
-            //! @brief Get the value of the config item
+            //! @brief Make assignment operator from IConfigItem available to set value
             //!
-            //! @return T Config value
-            //!
-            T GetValue() const
-            {
-                return value;
-            }
-            //!
-            //! @brief Assignment operator to set value
-            //!
-            //! @param value Value to be set
-            //!
-            void operator=(T value)
-            {
-                SetValue(value);
-            }
-            //!
-            //! @brief Operator T to return value
-            //!
-            //! @return T Value of the config item
-            //!
-            operator T()
-            {
-                return GetValue();
-            }
+            using IConfigItem<T>::operator=;
             //!
             //! @brief Mulitply config item value with another value
             //!

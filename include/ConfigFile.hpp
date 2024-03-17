@@ -68,13 +68,21 @@ namespace ModelController
             //!
             //! @tparam T Type of the value
             //! @param path Path to get config from
-            //! @param create If true, element with path is created, if not yet existing
+            //! @param create If true, element with path and type is created, if not yet existing
             //! @return T Element at specified path
             //!
             template<typename T>
             static std::optional<T> GetConfig(std::string path, bool create = false)
             {
                 JsonVariant config = GetConfig(path, create);
+                if constexpr (std::is_same<T, JsonArray>::value || std::is_same<T, JsonObject>::value)
+                {
+                    // Create JsonArray/JsonObject if not existing yet
+                    if (create && config.isNull())
+                    {
+                        config.to<T>();
+                    }
+                }                
                 return config.is<T>() ? std::optional<T>{config.as<T>()} : std::nullopt;
             }
             //!

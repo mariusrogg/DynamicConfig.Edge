@@ -8,6 +8,8 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <ArduinoJson.h>
+#include <vector>
 
 namespace ModelController
 {
@@ -99,5 +101,45 @@ namespace ModelController
             //! @return std::string String with random number
             //!
             static std::string GetRandomNumber(int length);
+            //!
+            //! @brief Convert json array to vector 
+            //! 
+            //! @tparam T Type of vector elements
+            //! @param jsonArray Array to be converted
+            //! @return std::vector<T> Converted array
+             //!
+            template<typename T>
+            static std::vector<T> JsonArrayToArray(JsonArray jsonArray)
+            {
+                std::vector<T> array;
+                for (JsonVariant item : jsonArray)
+                {
+                    if (item.is<T>())
+                    {
+                        array.push_back(item.as<T>());
+                    }
+                }
+                return array;
+            }
+            //!
+            //! @brief Convert array to JsonArray
+            //! 
+            //! @tparam T Encapsulated array type 
+            //! @param array Array to be converted
+            //! @param jsonArray Array to write valeus to
+            //! @param clear True if JsonArray is cleared before converting
+             //!
+            template<typename T> 
+            static void ArrayToJsonArray(std::vector<T> array, JsonArray jsonArray, bool clear = true)
+            {
+                if (clear)
+                {
+                    jsonArray.clear();
+                }
+                for (T item : array)
+                {
+                    jsonArray.add(item);
+                }
+            }
     };
 } // namespace ModelController
