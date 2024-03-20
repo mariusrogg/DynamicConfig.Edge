@@ -106,8 +106,7 @@ namespace ModelController
             //! @brief Construct a new input module
             //!
             //! @param name Name of the connector
-            //! @param pathConnectedModuleOut Path of the connected output
-            //! @param inputChanged Function called, if input changed
+            //! @param onInputChanged Function called, if input changed
             //! @param parent Parent of the Connector (normally pass this)
             //!
             ModuleIn(std::string name, std::function<void(T)> onInputChanged, BaseModule* parent = nullptr)
@@ -166,7 +165,7 @@ namespace ModelController
             //!
             //! @param value Target value for output
             //!
-            void SetValue(T value)
+            virtual void SetValue(T value)
             {
                 if (actualValue != value)
                 {
