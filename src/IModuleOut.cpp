@@ -15,14 +15,10 @@ namespace ModelController
     //!
     Event<std::string> IModuleOut::ModuleOutCreated;
     //!
-    //! @brief Wildcard signalizing, that submodules of created modules are ready for connection
-    //!
-    std::string IModuleOut::wildcardSuffix = "*";
-    //!
     //! @brief Construct a new ModuleOut object
     //!
     IModuleOut::IModuleOut(std::string name, BaseModule* parent, ModuleDataType dataType)
-        : BaseModule(name, parent, ModuleType::eOutput, dataType)
+        : IModuleConnector(name, parent, ModuleType::eOutput, dataType)
     {
     }
 } // namespace ModelController

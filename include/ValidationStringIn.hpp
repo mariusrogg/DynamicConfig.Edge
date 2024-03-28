@@ -40,5 +40,8 @@ namespace ModelController
             //! @param value Value set to the input variable
              //!
             virtual void SetValue(std::string value) override;
+            virtual std::vector<std::string> GetValidationStrings();
+            virtual std::vector<std::string> GetValidationRegex();
+            virtual void BuildConfig(JsonObject config) override;
     };
 } // namespace ModelController

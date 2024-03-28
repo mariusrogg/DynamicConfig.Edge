@@ -77,20 +77,10 @@ namespace ModelController
                     for (BaseModule* child : container->GetChildren())
                     {
                         bool apiVariable = false;
-                        if (IModuleOut* output = dynamic_cast<IModuleOut*>(child))
-                        {
-                            apiVariable = output->IsAPIConnected();
-                        }
-                        else if (IModuleIn* input = dynamic_cast<IModuleIn*>(child))
-                        {
-                            apiVariable = input->IsAPIConnected();
-                        }
-                        if (apiVariable)
+                        if (IModuleConnector* connector = dynamic_cast<IModuleConnector*>(child) && connector->IsAPIConnected())
                         {
                             JsonObject jVar = apiVars.add<JsonObject>();
-                            jVar["name"] = child->GetName();
-                            jVar["type"] = BaseModule::TypeToString(child->GetType());
-                            jVar["dataType"] = BaseModule::DataTypeToString(child->GetDataType());
+                            connector->BuildConfig(jVar);
                         }
                     }
                 }

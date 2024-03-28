@@ -93,4 +93,67 @@ namespace ModelController
             ModuleIn<std::string>::SetValue(value);
         }
     }
+    std::vector<std::string> ValidationStringIn::GetValidationStrings()
+    {
+        std::vector<std::string> validationStrings;
+        std::vector<std::string> validationRegex;
+        for (std::string validationValue : this->validationValues.GetValue())
+        {
+            // Add values from config (path) to validation
+            if (Utils::StartsWith(validationValue, "p:>"))
+            {
+                std::string path = Utils::TrimStart(validationValue, "p:>", 1);
+                JsonVariant config = ConfigFile::GetConfig(GetAbsolutePath(path));
+                if (config.is<std::string>())
+                {
+                    validationStrings.push_back(config.as<std::string>());
+                }
+                else if (config.is<JsonObject>())
+                {
+                    for (JsonPair childConfig : config.as<JsonObject>())
+                    {
+                        validationStrings.push_back(childConfig.key().c_str());
+                    }
+                }
+                else if (config.is<JsonArray>())
+                {
+                    for (JsonVariant item : config.as<JsonArray>())
+                    {
+                        if (item.is<std::string>())
+                        {
+                            validationStrings.push_back(item.as<std::string>());
+                        }
+                    }
+                }
+            }
+            else if (Utils::StartsWith(validationValue, "r:>"))
+            {
+                validationRegex.push_back(Utils::TrimStart(validationValue, "r:>", 1));
+            }
+            else
+            {
+                validationStrings.push_back(validationValue);
+            }
+        }
+        return validationStrings;
+    }
+    std::vector<std::string> ValidationStringIn::GetValidationRegex()
+    {
+        std::vector<std::string> validationRegex;
+        for (std::string validationValue : this->validationValues.GetValue())
+        {
+            // Add values from config (path) to validation
+            if (Utils::StartsWith(validationValue, "r:>"))
+            {
+                validationRegex.push_back(Utils::TrimStart(validationValue, "r:>", 1));
+            }
+        }
+        return validationRegex;
+    }
+    void ValidationStringIn::BuildConfig(JsonObject config)
+    {
+        ModuleIn<std::string>::BuildConfig(config);
+        Utils::ArrayToJsonArray<std::string>(GetValidationStrings(), config["validationStrings"].to<JsonArray>());
+        Utils::ArrayToJsonArray<std::string>(GetValidationRegex(), config["validationRegex"].to<JsonArray>());
+    }
 } // namespace ModelController

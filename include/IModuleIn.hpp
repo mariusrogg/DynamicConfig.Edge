@@ -6,29 +6,18 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseModule.hpp"
+#include "IModuleConnector.hpp"
 #include "EventHandling.hpp"
 
 namespace ModelController
 { // ToDo: inform out on deletion and other way round
-    class IModuleIn : public BaseModule
+    class IModuleIn : public IModuleConnector
     {
         public:
-            //!
-            //! @brief Wildcard showing, that all ouput submodules are available for inputs
-            //!
-            static std::string wildcardSuffix;
             //!
             //! @brief Event raised, if new ModuleIn was created
             //!
             static Event<std::string> ModuleInCreated;
-            //!
-            //! @brief Check if variable is connected to API
-            //!
-            //! @return true If connected to API
-            //! @return false If connected to output
-            //!
-            virtual bool IsAPIConnected() const = 0;
             //!
             //! @brief Construct a new module in object
             //!

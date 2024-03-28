@@ -6,29 +6,18 @@
 //! @copyright Copyright (c) 2023
 //!
 #pragma once
-#include "BaseModule.hpp"
+#include "IModuleConnector.hpp"
 #include "EventHandling.hpp"
 
 namespace ModelController
 {
-    class IModuleOut : public BaseModule
+    class IModuleOut : public IModuleConnector
     {
         public:
-            //!
-            //! @brief Wildcard showing, that all ouput submodules are available for inputs
-            //!
-            static std::string wildcardSuffix;
             //!
             //! @brief Event raised, if new ModuleOut was created
             //!
             static Event<std::string> ModuleOutCreated;
-            //!
-            //! @brief Check if variable is connected to API
-            //!
-            //! @return true If connected to API
-            //! @return false If connected to output
-            //!
-            virtual bool IsAPIConnected() const = 0;
             //!
             //! @brief Construct a new module out object
             //!
