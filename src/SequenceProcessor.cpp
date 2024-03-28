@@ -98,7 +98,7 @@ namespace ModelController
         off(ConfigFile::GetConfig<std::string>(GetPath() + "/off").value_or("{}")), // ToDo: Sequence and modes as BaseModule
         activate("activate", [&](bool value) { this->OnActivateChanged(value); }, this),
         manualTarget("manualTarget", [&](double value) { this->OnManualTargetChanged(value); }, this),
-        targetMode("targetMode", [&](std::string value) { this->OnTargetModeChanged(value); }, this),
+        targetMode("targetMode", [&](std::string value) { this->OnTargetModeChanged(value); }, {"p:>../modes", "off"}, this),
         defaultMode("defaultMode", "", this),
         active("active", this)
     {

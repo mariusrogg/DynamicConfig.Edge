@@ -154,29 +154,34 @@ namespace ModelController
                 std::transform(value.begin(), value.end(), value.begin(), tolower);
                 return value != "0" && value != "false" && value != "n" && value != "no";
             }
-            static std::string GetAbsolutePath(std::string actualPath, std::string relativePath)
+            //!
+            //! @brief Get the Absolute Path of an object
+            //!
+            //! @param actualPath Absolute path of actual object
+            //! @param relativePath Relative path (from actual path)
+            //! @return std::string Absolute path
+            //!
+            static std::string GetAbsolutePath(std::string relativePath, std::string actualPath = "/")
             {
                 std::string absolutePath = StartsWith(relativePath, "/") ? relativePath :  actualPath + "/" + relativePath;
                 absolutePath = "/" + absolutePath + "/";
-                std::regex regexMultiSlash("(/)+");
 
+                std::regex regexMultiSlash("(/)+");
                 absolutePath = std::regex_replace(absolutePath, regexMultiSlash, "/");
 
-                std::regex regexSingleDot("(/\\./)+");
-
+                std::regex regexSingleDot("(/\\.(?=/))+/");
                 absolutePath = std::regex_replace(absolutePath, regexSingleDot, "/");
 
-                std::regex regexDoubleDotBeginning("^(/\\.\\.)+/");
+                std::string regexDoubleDot = "/[^/\\.]+/\\.\\.(?=/)";
+                while (std::regex_match(absolutePath, std::regex(".*" + regexDoubleDot + ".*")))
+                {
+                    absolutePath = std::regex_replace(absolutePath, std::regex(regexDoubleDot), "");
+                }
 
+                std::regex regexDoubleDotBeginning("^(/\\.\\.)+/");
                 absolutePath = std::regex_replace(absolutePath, regexDoubleDotBeginning, "/");
 
                 return absolutePath;
             }
-            // ToDo: Method to create absolute path: ^.*?((?P<sub>(?P<parentdir>\/[^\/]*)(\/\.\.))).*$
-            // /../a/b/../c/../../d/e
-            // /a/b/..
-            // /../../
-            // /../
-            // /...
     };
 } // namespace ModelController

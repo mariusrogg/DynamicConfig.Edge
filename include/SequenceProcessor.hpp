@@ -14,6 +14,7 @@
 #include "SequenceMode.hpp"
 #include "LoopEvent.hpp"
 #include "ConfigItem.hpp"
+#include "ValidationStringIn.hpp"
 
 namespace ModelController
 {
@@ -51,7 +52,7 @@ namespace ModelController
             //!
             //! @brief Input value for setting target mode
             //!
-            ModuleIn<std::string> targetMode;
+            ValidationStringIn targetMode;
             //!
             //! @brief Method called, if targetMode value changed
             //!

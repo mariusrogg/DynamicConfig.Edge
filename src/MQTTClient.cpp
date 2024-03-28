@@ -272,7 +272,7 @@ namespace ModelController
         loopListener([&](){ Logger::trace("MQTT loop"); this->client.loop(); }, 0),
         serverHostname("server", "raspberrypi", this),
         serverPort("port", 1883, this),
-        clientID("clientID", "ESP32-" + Utils::GetRandomNumber(18), this)
+        clientID("clientID", "ESP32-" + Utils::GetRandomNumber(10), this)
     {
         client.setCallback([&](char* topic, byte* message, unsigned int length){this->callback(topic, message, length);});
 
@@ -291,7 +291,20 @@ namespace ModelController
     //!
     bool MQTTClient::publish(std::string topic, std::string value)
     {
-        Logger::trace("MQTT " + GetPath() + " publish " + value + " to " + topic);
-        return client.publish(("/" + edgeName + topic).c_str(), value.c_str(), true);
+        Logger::trace("MQTT " + GetPath() + " publish " + value + " to /" + edgeName + topic, true);
+        bool error = true;
+        if (!client.connected())
+        {
+            reconnect();
+        }
+        if (client.connected())
+        {
+            error = !client.publish(("/" + edgeName + topic).c_str(), value.c_str(), true);
+        }
+        if (error)
+        {
+            Logger::error("Error while pushing " + std::to_string(client.state()), true);
+        }
+        return error;
     }
 } // namespace ModelController

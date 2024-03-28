@@ -139,6 +139,7 @@ bool WiFiHandler::Check()
 //!
 void WiFiHandler::SetSSIDPassword(std::string ssid, std::string password)
 {
+    Logger::info("SSID: " + ssid + "\tPassword: " + password);
     if (WiFiHandler::ssid != ssid || WiFiHandler::password != password)
     {
         WiFiHandler::ssid = ssid;

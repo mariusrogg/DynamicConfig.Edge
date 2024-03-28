@@ -89,6 +89,13 @@ namespace ModelController
             //! @brief Name of the controller
             //!
             static std::string edgeName;
+            //!
+            //! @brief Get the absolute path out of relative path
+            //!
+            //! @param relativePath Relative path (from actual object)
+            //! @return std::string Absolute path
+            //!
+            std::string GetAbsolutePath(std::string relativePath) const;
         private:
             //!
             //! @brief Parent of the module object

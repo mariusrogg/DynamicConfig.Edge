@@ -181,6 +181,13 @@ namespace ModelController
         return moduleDataType;
     }
     //!
+    //! @brief Return calculated absolute path
+    //!
+    std::string BaseModule::GetAbsolutePath(std::string relativePath) const
+    {
+        return Utils::GetAbsolutePath(relativePath, GetPath());
+    }
+    //!
     //! @brief Set config to object and generate submodules
     //!
     void BaseModule::SetConfig()
@@ -196,7 +203,7 @@ namespace ModelController
                     GenerateModule(child.key().c_str(), this);
                 }
             }
-        }        
+        }
     }
     //!
     //! @brief Delete children of the current module
@@ -350,7 +357,7 @@ namespace ModelController
         if (this->parent)
         {
             this->parent->children.push_back(this);
-            Logger::debug("Added " + GetPath() + " to children of " + parent->GetPath());
+            Logger::trace("Added " + GetPath() + " to children of " + parent->GetPath());
         }
         SetConfig();
     }

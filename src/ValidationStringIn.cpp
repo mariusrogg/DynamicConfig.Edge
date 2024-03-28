@@ -8,25 +8,25 @@
 #include "ValidationStringIn.hpp"
 
 namespace ModelController
-{    
+{
     //!
     //! @brief Call base ctor and initialze members
     //!
-    ValidationStringIn::ValidationStringIn(std::string name, std::function<void(std::string)> onInputChanged, BaseModule* parent)
+    ValidationStringIn::ValidationStringIn(std::string name, std::function<void(std::string)> onInputChanged, std::vector<std::string> defaultValidationValues, BaseModule* parent)
         : ModuleIn<std::string>(name, onInputChanged, parent),
-        validationValues("validation", {""}, this, true)
+        validationValues("validation", defaultValidationValues, this, true)
     {
     }
     // ToDo: Method to create description of ModuleIn
     //!
     //! @brief Nothing to destruct
-    //! 
+    //!
     ValidationStringIn::~ValidationStringIn()
     {
     }
     //!
     //! @brief Collect values by which value is validated and check input value, only sets value, if it matches validation
-    //! 
+    //!
     void ValidationStringIn::SetValue(std::string value)
     {
         Logger::trace("ValidationString::SetValue(" + value + ")");
@@ -39,7 +39,7 @@ namespace ModelController
             if (Utils::StartsWith(validationValue, "p:>"))
             {
                 std::string path = Utils::TrimStart(validationValue, "p:>", 1);
-                JsonVariant config = ConfigFile::GetConfig(path);
+                JsonVariant config = ConfigFile::GetConfig(GetAbsolutePath(path));
                 if (config.is<std::string>())
                 {
                     validationStrings.push_back(config.as<std::string>());
@@ -84,6 +84,7 @@ namespace ModelController
                 if (std::regex_match(value, regex))
                 {
                     setValue = true;
+                    break;
                 }
             }
         }
@@ -91,5 +92,5 @@ namespace ModelController
         {
             ModuleIn<std::string>::SetValue(value);
         }
-    }    
+    }
 } // namespace ModelController
