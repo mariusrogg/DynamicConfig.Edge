@@ -41,6 +41,16 @@ namespace ModelController
             //!
             Event<T> ValueChangedEvent;
             //!
+            //! @brief Variable is connected to API, if path doesn't starts with BaseModule::apiPath
+            //!
+            //! @return true If connected to API
+            //! @return false If connected to output
+            //!
+            virtual bool IsAPIConnected() const override
+            {
+                return !Utils::StartsWith(GetPath(), apiPath);
+            }
+            //!
             //! @brief Construct a new output module
             //!
             //! @param name Name of the connector

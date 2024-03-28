@@ -8,6 +8,7 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 namespace ModelController
 {
@@ -99,5 +100,17 @@ namespace ModelController
             //! @return std::string String with random number
             //!
             static std::string GetRandomNumber(int length);
+            //!
+            //! @brief Tranform string value to bool
+            //!
+            //! @param value Value to be transformed
+            //! @return false Value represents false ("0", "false", "n", "no")
+            //! @return true All other values
+            //!
+            static bool ToBool(std::string value)
+            {
+                std::transform(value.begin(), value.end(), value.begin(), tolower);
+                return value != "0" && value != "false" && value != "n" && value != "no";
+            }
     };
 } // namespace ModelController

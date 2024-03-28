@@ -97,6 +97,12 @@ namespace ModelController
             //!
             MQTTClient(std::string name, JsonObject config, BaseModule* parent = nullptr);
             //!
+            //! @brief Get the type of the container
+            //!
+            //! @return std::string Type of the container in string representation
+            //!
+            virtual std::string GetContainerType() override;
+            //!
             //! @brief Publish topic to mqtt broker
             //!
             //! @param topic Topic to be published

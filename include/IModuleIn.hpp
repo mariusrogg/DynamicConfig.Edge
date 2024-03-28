@@ -23,6 +23,13 @@ namespace ModelController
             //!
             static Event<std::string> ModuleInCreated;
             //!
+            //! @brief Check if variable is connected to API
+            //!
+            //! @return true If connected to API
+            //! @return false If connected to output
+            //!
+            virtual bool IsAPIConnected() const = 0;
+            //!
             //! @brief Construct a new module in object
             //!
             //! @param name Name of the module

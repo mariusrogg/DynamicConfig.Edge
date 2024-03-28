@@ -143,5 +143,11 @@ namespace ModelController
             //! @brief Destruction of the Sequence Processor object
             //!
             ~SequenceProcessor();
+            //!
+            //! @brief Get the type of the container
+            //!
+            //! @return std::string Type of the container in string representation
+            //!
+            virtual std::string GetContainerType() override;
     };
 } // namespace ModelController

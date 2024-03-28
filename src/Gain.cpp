@@ -26,4 +26,11 @@ namespace ModelController
             gain("gain", config, 1, this)
         {
         }
+    //!
+    //! @brief Returns type
+    //!
+    std::string Gain::GetContainerType()
+    {
+        return type;
+    }
 } // namespace ModelController
