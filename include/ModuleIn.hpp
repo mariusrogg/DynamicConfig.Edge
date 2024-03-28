@@ -106,7 +106,7 @@ namespace ModelController
             //!
             virtual bool IsAPIConnected() const override
             {
-                return pathConnectedModuleOut == apiPath + this->GetPath();
+                return pathConnectedModuleOut.GetValue() == apiPath + this->GetPath();
             }
             //!
             //! @brief Event raised, if value changed
@@ -121,7 +121,7 @@ namespace ModelController
             //!
             ModuleIn(std::string name, std::function<void(T)> onInputChanged, BaseModule* parent = nullptr)
                 : IModuleIn(name, parent, GetDataTypeById(typeid(T))),
-                pathConnectedModuleOut("connectedOut", Utils::StartsWith(GetPath(), apiPath) ? "" : apiPath + GetPath(), this)   // Default value for API Input Variables is empty (not connected to anything) 
+                pathConnectedModuleOut("connectedOut", Utils::StartsWith(GetPath(), apiPath) ? "" : apiPath + GetPath(), this)   // Default value for API Input Variables is empty (not connected to anything)
             {
                 this->inputChanged = new typename Event<T>::Listener(&(this->ValueChangedEvent), onInputChanged);
                 Logger::trace("ModuleIn::ModuleIn(" + name + ", " + this->pathConnectedModuleOut.GetValue() + ")");

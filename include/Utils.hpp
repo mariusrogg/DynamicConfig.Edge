@@ -11,6 +11,7 @@
 #include <ArduinoJson.h>
 #include <vector>
 #include <algorithm>
+#include <regex>
 
 namespace ModelController
 {
@@ -141,6 +142,7 @@ namespace ModelController
                 {
                     jsonArray.add(item);
                 }
+            }
             //! @brief Tranform string value to bool
             //!
             //! @param value Value to be transformed
@@ -152,5 +154,29 @@ namespace ModelController
                 std::transform(value.begin(), value.end(), value.begin(), tolower);
                 return value != "0" && value != "false" && value != "n" && value != "no";
             }
+            static std::string GetAbsolutePath(std::string actualPath, std::string relativePath)
+            {
+                std::string absolutePath = StartsWith(relativePath, "/") ? relativePath :  actualPath + "/" + relativePath;
+                absolutePath = "/" + absolutePath + "/";
+                std::regex regexMultiSlash("(/)+");
+
+                absolutePath = std::regex_replace(absolutePath, regexMultiSlash, "/");
+
+                std::regex regexSingleDot("(/\\./)+");
+
+                absolutePath = std::regex_replace(absolutePath, regexSingleDot, "/");
+
+                std::regex regexDoubleDotBeginning("^(/\\.\\.)+/");
+
+                absolutePath = std::regex_replace(absolutePath, regexDoubleDotBeginning, "/");
+
+                return absolutePath;
+            }
+            // ToDo: Method to create absolute path: ^.*?((?P<sub>(?P<parentdir>\/[^\/]*)(\/\.\.))).*$
+            // /../a/b/../c/../../d/e
+            // /a/b/..
+            // /../../
+            // /../
+            // /...
     };
 } // namespace ModelController
