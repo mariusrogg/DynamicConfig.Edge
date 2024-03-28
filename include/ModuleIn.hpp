@@ -99,6 +99,16 @@ namespace ModelController
 
         public:
             //!
+            //! @brief Variable is connected to API, if path of connected output is apiPath + module path
+            //!
+            //! @return true If connected to API
+            //! @return false If connected to output
+            //!
+            virtual bool IsAPIConnected() const override
+            {
+                return pathConnectedModuleOut == apiPath + this->GetPath();
+            }
+            //!
             //! @brief Event raised, if value changed
             //!
             Event<T> ValueChangedEvent;

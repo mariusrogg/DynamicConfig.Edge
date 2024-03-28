@@ -130,6 +130,13 @@ namespace ModelController
         }
     }
     //!
+    //! @brief Returns type
+    //!
+    std::string SequenceProcessor::GetContainerType()
+    {
+        return type;
+    }
+    //!
     //! @brief Calculate target value and set value to channel
     //!
     void SequenceProcessor::Execute()

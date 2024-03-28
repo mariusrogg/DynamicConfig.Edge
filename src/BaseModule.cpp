@@ -296,42 +296,42 @@ namespace ModelController
     //!
     //! @brief Checks type of object and parameter type match and add object's and matching children's path to list
     //!
-    std::vector<std::string> BaseModule::GetContainers(std::string type)
+    std::vector<BaseModule*> BaseModule::GetContainers(std::string type)
     {
         Logger::trace(GetPath() + "->BaseModule::GetContainers(" + type  + ")");
-        std::vector<std::string> containers;
+        std::vector<BaseModule*> containers;
         BaseContainer* container = dynamic_cast<BaseContainer*>(this);
         if (container != nullptr)
         {
             if (type.empty())
             {
                 Logger::trace("Found container");
-                containers.push_back(GetPath());
+                containers.push_back(container);
             }
             else if (dynamic_cast<Gain*>(this) && type == Gain::type)
             {
                 Logger::trace("Found container");
-                containers.push_back(GetPath());
+                containers.push_back(container);
             }
             else if (dynamic_cast<SequenceProcessor*>(this) && type ==SequenceProcessor::type)
             {
                 Logger::trace("Found container");
-                containers.push_back(GetPath());
+                containers.push_back(container);
             }
             else if (dynamic_cast<OnboardPWM*>(this) && type == OnboardPWM::type)
             {
                 Logger::trace("Found container");
-                containers.push_back(GetPath());
+                containers.push_back(container);
             }
             else if (dynamic_cast<MQTTClient*>(this) && type == MQTTClient::type)
             {
                 Logger::trace("Found container");
-                containers.push_back(GetPath());
+                containers.push_back(container);
             }
         }
         for (BaseModule* child : children)
         {
-            std::vector<std::string> childContainers = child->GetContainers(type);
+            std::vector<BaseModule*> childContainers = child->GetContainers(type);
             containers.insert(containers.end(), childContainers.begin(), childContainers.end());
         }
         return containers;
@@ -418,6 +418,13 @@ namespace ModelController
         return parent;
     }
     //!
+    //! @brief Returns children of the actual object
+    //!
+    std::vector<BaseModule*> BaseModule::GetChildren() const
+    {
+        return children;
+    }
+    //!
     //! @brief Returns path of the actual object
     //!
     std::string BaseModule::GetPath() const
@@ -493,10 +500,10 @@ namespace ModelController
     //!
     //! @brief
     //!
-    std::vector<std::string> BaseModule::GetContainers(std::string path, std::string type)
+    std::vector<BaseModule*> BaseModule::GetContainers(std::string path, std::string type)
     {
         BaseModule* module = GetFinalMatchingModule<BaseModule>(path);
-        std::vector<std::string> containers;
+        std::vector<BaseModule*> containers;
         if (module == nullptr)
         {
             Logger::trace("Module not found");
@@ -517,7 +524,7 @@ namespace ModelController
                 {
                     if (Utils::StartsWith(child->GetPath(), path))
                     {
-                        std::vector<std::string> childContainers = child->GetContainers(type);
+                        std::vector<BaseModule*> childContainers = child->GetContainers(type);
                         containers.insert(containers.end(), childContainers.begin(), childContainers.end());
                     }
                 }

@@ -48,6 +48,12 @@ namespace ModelController
             //! @param parent Parent module
             //!
             Gain(std::string name, BaseModule* parent = nullptr);
+            //!
+            //! @brief Get the type of the container
+            //!
+            //! @return std::string Type of the container in string representation
+            //!
+            virtual std::string GetContainerType() override;
     };
 
 } // namespace ModelController

@@ -130,4 +130,11 @@ namespace ModelController
         config << ", \"frequency\": " << frequency;
         return config.str();
     }
+    //!
+    //! @brief Returns type
+    //!
+    std::string OnboardPWM::GetContainerType()
+    {
+        return type;
+    }
 } // namespace ModelController

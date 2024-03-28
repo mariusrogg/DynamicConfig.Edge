@@ -153,9 +153,9 @@ namespace ModelController
             //! @brief Get the containers with specified type
             //!
             //! @param type Type of the containers to get
-            //! @return std::vector<std::string> List with paths to all containers of type
+            //! @return std::vector<BaseContainer*> List with containers of type
             //!
-            std::vector<std::string> GetContainers(std::string type);
+            std::vector<BaseModule*> GetContainers(std::string type);
         public:
             //!
             //! @brief Root module of the hardware configuration
@@ -192,6 +192,12 @@ namespace ModelController
             //! @return BaseModule* Parent of the object
             //!
             BaseModule* GetParent() const;
+            //!
+            //! @brief Get the Children of the object
+            //!
+            //! @return BaseModule* Children of the object
+            //!
+            std::vector<BaseModule*> GetChildren() const;
             //!
             //! @brief Get the path of the object
             //!
@@ -288,9 +294,9 @@ namespace ModelController
             //!
             //! @param type Type of the searched containers
             //! @param path Path of module to search from
-            //! @return std::vector<std::string> List with paths to all containers of type
+            //! @return std::vector<BaseModule*> List with containers of type
             //!
-            static std::vector<std::string> GetContainers(std::string path, std::string type);
+            static std::vector<BaseModule*> GetContainers(std::string path, std::string type);
             //!
             //! @brief Update hardware configuration
             //!

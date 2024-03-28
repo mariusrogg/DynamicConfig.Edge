@@ -280,6 +280,13 @@ namespace ModelController
         IModuleIn::ModuleInCreated(this->GetPath() + "/*");
     }
     //!
+    //! @brief Returns type
+    //!
+    std::string MQTTClient::GetContainerType()
+    {
+        return type;
+    }
+    //!
     //! @brief Calls publish from PubSubClient
     //!
     bool MQTTClient::publish(std::string topic, std::string value)

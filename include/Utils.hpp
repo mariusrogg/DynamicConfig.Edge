@@ -10,6 +10,7 @@
 #include <sstream>
 #include <ArduinoJson.h>
 #include <vector>
+#include <algorithm>
 
 namespace ModelController
 {
@@ -102,8 +103,8 @@ namespace ModelController
             //!
             static std::string GetRandomNumber(int length);
             //!
-            //! @brief Convert json array to vector 
-            //! 
+            //! @brief Convert json array to vector
+            //!
             //! @tparam T Type of vector elements
             //! @param jsonArray Array to be converted
             //! @return std::vector<T> Converted array
@@ -123,13 +124,13 @@ namespace ModelController
             }
             //!
             //! @brief Convert array to JsonArray
-            //! 
-            //! @tparam T Encapsulated array type 
+            //!
+            //! @tparam T Encapsulated array type
             //! @param array Array to be converted
             //! @param jsonArray Array to write valeus to
             //! @param clear True if JsonArray is cleared before converting
              //!
-            template<typename T> 
+            template<typename T>
             static void ArrayToJsonArray(std::vector<T> array, JsonArray jsonArray, bool clear = true)
             {
                 if (clear)
@@ -140,6 +141,16 @@ namespace ModelController
                 {
                     jsonArray.add(item);
                 }
+            //! @brief Tranform string value to bool
+            //!
+            //! @param value Value to be transformed
+            //! @return false Value represents false ("0", "false", "n", "no")
+            //! @return true All other values
+            //!
+            static bool ToBool(std::string value)
+            {
+                std::transform(value.begin(), value.end(), value.begin(), tolower);
+                return value != "0" && value != "false" && value != "n" && value != "no";
             }
     };
 } // namespace ModelController

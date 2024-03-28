@@ -7,6 +7,9 @@
 //!
 #include "ConfigAPI.hpp"
 #include "Logger.hpp"
+#include "BaseContainer.hpp"
+#include "IModuleIn.hpp"
+#include "IModuleOut.hpp"
 
 namespace ModelController
 {
@@ -55,13 +58,43 @@ namespace ModelController
     {
         std::string path = GetPathFromArgs();
         std::string type = GetFromArgs("type");
-        Logger::debug("ConfigAPI: Received GetContainers for path " + path + " with type '" + type + "'");
-        std::vector<std::string> containers = BaseModule::GetContainers(path, type);
+        std::string apiRequested = GetFromArgs("api");
+        bool api = Utils::ToBool(apiRequested);
+        Logger::debug("ConfigAPI: Received GetContainers for path " + path + " with type '" + type + "' and api '" + apiRequested + "'");
+        std::vector<BaseModule*> containers = BaseModule::GetContainers(path, type);
         JsonDocument doc;
         JsonArray arr = doc.to<JsonArray>();
-        for (std::string container : containers)
+        for (BaseModule* module : containers)
         {
-            arr.add(container);
+            if (BaseContainer* container = dynamic_cast<BaseContainer*>(module))
+            {
+                JsonObject obj = arr.add<JsonObject>();
+                obj["path"] = container->GetPath();
+                obj["type"] = container->GetContainerType();
+                if (api)
+                {
+                    JsonArray apiVars = obj["API"].to<JsonArray>();
+                    for (BaseModule* child : container->GetChildren())
+                    {
+                        bool apiVariable = false;
+                        if (IModuleOut* output = dynamic_cast<IModuleOut*>(child))
+                        {
+                            apiVariable = output->IsAPIConnected();
+                        }
+                        else if (IModuleIn* input = dynamic_cast<IModuleIn*>(child))
+                        {
+                            apiVariable = input->IsAPIConnected();
+                        }
+                        if (apiVariable)
+                        {
+                            JsonObject jVar = apiVars.add<JsonObject>();
+                            jVar["name"] = child->GetName();
+                            jVar["type"] = BaseModule::TypeToString(child->GetType());
+                            jVar["dataType"] = BaseModule::DataTypeToString(child->GetDataType());
+                        }
+                    }
+                }
+            }
         }
 
         std::string message = doc.as<std::string>();

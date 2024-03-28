@@ -32,5 +32,11 @@ namespace ModelController
             //! @param dataType DataType of the module
             //!
             BaseContainer(std::string name, BaseModule* parent = nullptr, BaseModule::ModuleType type = BaseModule::ModuleType::eUndefined, BaseModule::ModuleDataType dataType = BaseModule::ModuleDataType::eUndefined);
+            //!
+            //! @brief Get the type of the container
+            //!
+            //! @return std::string Type of the container in string representation
+            //!
+            virtual std::string GetContainerType() = 0;
     };
 } // namespace ModelController
