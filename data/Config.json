@@ -75,12 +75,10 @@
         {
             "type": "gain",
             "in": "/Connectors/mqtt/in/double4",
-            "out": "/Connectors/mqtt/out/double4",
             "gain": 1
         },
         "Taxi":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -101,7 +99,6 @@
         },
         "Takeoff":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -122,7 +119,6 @@
         },
         "WingPosition":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -140,7 +136,6 @@
         },
         "Beacon":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -159,7 +154,6 @@
         },
         "WingStrobe":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -178,7 +172,6 @@
         },
         "Logo":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
@@ -196,7 +189,6 @@
         },
         "TailStrobe":
         {
-            "shortPath": true,
             "type": "sequence",
             "pins":
             {
